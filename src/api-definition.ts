@@ -1,23 +1,7 @@
 import { z } from "zod";
-import { tsSchema } from "./type-providers";
-import { ReadonlyDeep } from "./utils.types";
-
-const ApiZodSchema: SchemaType<ZodTypeProvider> = {
-  validate: (schema, input) => schema.safeParse(input),
-  validateAsync: (schema, input) => schema.safeParseAsync(input),
-};
-
-const ApiTypeScriptSchema = {
-  validate: (schema: any, input: unknown) => {
-    return { success: true, data: input } as SchemaValidationResult;
-  },
-  validateAsync: (schema: any, input: unknown) => {
-    return Promise.resolve({
-      success: true,
-      data: input,
-    }) as Promise<SchemaValidationResult>;
-  },
-};
+import type { SchemaType } from "./schema-type.types";
+import { ApiZodSchema } from "./schema-type-zod";
+import { ApiTypeScriptSchema, tsSchema } from "./schema-type-ts";
 
 // example of a complete API specification
 export const apiSpec = makeApiSpec({
@@ -165,105 +149,71 @@ export const apiSpec = makeApiSpec({
   },
 });
 
-function makeApiSpec<const T extends ReadonlyDeep<ApiSpec>>(spec: T): T {
+function makeApiSpec<const T extends ApiSpec>(spec: T): T {
   return spec;
-}
-
-export interface ApiTypeProvider<Schema = unknown> {
-  schema: Schema;
-  input: unknown;
-  output: unknown;
-}
-export type InferInputTypeFromSchema<
-  TypeProvider extends ApiTypeProvider,
-  Schema
-> = (TypeProvider & { schema: Schema })["input"];
-
-export type InferOutputTypeFromSchema<
-  TypeProvider extends ApiTypeProvider,
-  Schema
-> = (TypeProvider & { schema: Schema })["output"];
-
-export type SchemaValidationResult =
-  | { success: true; data: any }
-  | { success: false; error: any };
-
-export interface ZodTypeProvider
-  extends ApiTypeProvider<{ _input: unknown; _output: unknown }> {
-  input: this["schema"]["_input"];
-  output: this["schema"]["_output"];
 }
 
 /**
  * Api specification
  */
 export interface ApiSpec {
-  metadata?: ApiMetadata;
-  endpoints: Record<string, ApiEndpoint>;
-  security?: ApiSecurity;
+  readonly metadata?: ApiMetadata;
+  readonly endpoints: Record<string, ApiEndpoint>;
+  readonly security?: ApiSecurity;
 }
 
 /**
  * Api metadata about the available servers
  */
 interface ApiServer {
-  url: string;
-  name: string;
+  readonly url: string;
+  readonly name: string;
 }
 
 interface ApiSecurity {
-  [name: string]: unknown;
-}
-
-interface SchemaType<TypeProvider extends ApiTypeProvider = ApiTypeProvider> {
-  readonly _provider?: TypeProvider;
-  validate: (schema: any, input: unknown) => SchemaValidationResult;
-  validateAsync: (
-    schema: any,
-    input: unknown
-  ) => Promise<SchemaValidationResult>;
+  readonly [name: string]: unknown;
 }
 
 interface ApiEndpoint {
   /**
    * optional metadata for the endpoint
    */
-  metadata?: ApiEndpointMetadata;
+  readonly metadata?: ApiEndpointMetadata;
   /**
    * HTTP method for the endpoint
    */
-  method: ApiMethod;
+  readonly method: ApiMethod;
   /**
    * Path for the endpoint
    */
-  path: string;
+  readonly path: string;
   /**
    * Query parameters for the endpoint
    */
-  query?: Record<string, ApiParameter>;
+  readonly query?: Record<string, ApiParameter>;
   /**
    * Path parameters for the endpoint
    */
-  params?: Record<string, ApiParameter>;
+  readonly params?: Record<string, ApiParameter>;
   /**
    * Headers for the endpoint
    */
-  headers?: Record<string, ApiParameter>;
+  readonly headers?: Record<string, ApiParameter>;
   /**
    * Cookies for the endpoint
    */
-  cookies?: Record<string, ApiParameter>;
+  readonly cookies?: Record<string, ApiParameter>;
   /**
    * Body for the endpoint
    */
-  body?: ApiDataParameter;
+  readonly body?: ApiDataParameter;
   /**
    * Possible responses for the endpoint
    * The key is the HTTP status code
    * The key "default" is used for the default response (only use for error responses)
    */
-  responses: {
-    [key in number | "default"]?: ApiDataParameter;
+  readonly responses: {
+    readonly [key in number | "default"]?: ApiDataParameter;
   };
 }
 
@@ -274,11 +224,11 @@ interface ApiParameter {
   /**
    * optional metadata for the parameter
    */
-  metadata?: ParameterMetadata;
+  readonly metadata?: ParameterMetadata;
   /**
    * Schema for the parameter
    */
-  schema: unknown;
+  readonly schema: unknown;
 }
 
 /**
@@ -288,11 +238,11 @@ interface ApiDataParameter {
   /**
    * optional metadata for the parameter
    */
-  metadata?: ApiDataMetadata;
+  readonly metadata?: ApiDataMetadata;
   /**
    * Schema for the request or response body
    */
-  schema: unknown;
+  readonly schema: unknown;
 }
 
 /**
@@ -302,13 +252,13 @@ interface ApiBaseMetadata {
   /**
    * optional description for the associated element
    */
-  description?: string;
+  readonly description?: string;
   /**
    * optionally override the default schema type for the associated element
    * This allows to use a custom schema type for the associated element
    * Implementations of API spec can make one or more schema handled byt default
    */
-  schemaType?: SchemaType;
+  readonly schemaType?: SchemaType;
 }
 
 /**
@@ -319,15 +269,15 @@ interface ApiMetadata extends ApiBaseMetadata {
   /**
    * Name of the API
    */
-  name: string;
+  readonly name: string;
   /**
    * Version of the API
    */
-  version: string;
+  readonly version: string;
   /**
    * List of servers for the API
    */
-  servers?: ApiServer[];
+  readonly servers?: readonly ApiServer[];
 }
 
 /**
@@ -337,15 +287,15 @@ interface ApiEndpointMetadata extends ApiBaseMetadata {
   /**
    * Tags can be used for grouping endpoints in the documentation
    */
-  tags?: string[];
+  readonly tags?: readonly string[];
   /**
    * Resource name for the endpoint, allows to implement cache normalization
    */
-  resource?: string;
+  readonly resource?: string;
   /**
    * Resource ID for the endpoint, allows to implement cache normalization
    */
-  resourceId?: string;
+  readonly resourceId?: string;
 }
 
 interface ParameterMetadata extends ApiBaseMetadata {}
@@ -411,23 +361,20 @@ interface ApiDataMetadata extends ApiBaseMetadata {
    * Content type for the request or response body
    * application/json is the default content type
    */
-  contentType?: ApiMediaType; // default to application/json
+  readonly contentType?: ApiMediaType; // default to application/json
   /**
    * Data format for the request or response body
    * json is the default format
    */
-  format?: ApiDataFormat;
+  readonly format?: ApiDataFormat;
 }
 
 export type ApiSpecGetEndpoint<
-  Api extends ReadonlyDeep<ApiSpec>,
+  Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"]
 > = Api["endpoints"][Endpoint];
 
-type ApiSpecGetPathsByMethod<
-  Api extends ReadonlyDeep<ApiSpec>,
-  Method extends ApiMethod
-> = {
+type ApiSpecGetPathsByMethod<Api extends ApiSpec, Method extends ApiMethod> = {
   [Endpoint in keyof Api["endpoints"]]: ApiSpecGetEndpoint<
     Api,
     Endpoint
@@ -437,7 +384,7 @@ type ApiSpecGetPathsByMethod<
 }[keyof Api["endpoints"]];
 
 export type ApiSpecGetEndpointByPath<
-  Api extends ReadonlyDeep<ApiSpec>,
+  Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiSpecGetPathsByMethod<Api, Method>
 > = {
@@ -452,32 +399,32 @@ export type ApiSpecGetEndpointByPath<
 }[keyof Api["endpoints"]];
 
 type ApiSpecGetEndpointBody<
-  Api extends ReadonlyDeep<ApiSpec>,
+  Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"]
 > = ApiSpecGetEndpoint<Api, Endpoint>["body"];
 type ApiSpecGetEndpointParams<
-  Api extends ReadonlyDeep<ApiSpec>,
+  Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"]
 > = ApiSpecGetEndpoint<Api, Endpoint>["params"];
 type ApiSpecGetEndpointQueries<
-  Api extends ReadonlyDeep<ApiSpec>,
+  Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"]
 > = ApiSpecGetEndpoint<Api, Endpoint>["query"];
 type ApiSpecGetEndpointQuery<
-  Api extends ReadonlyDeep<ApiSpec>,
+  Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   Query extends keyof ApiSpecGetEndpoint<Api, Endpoint>["query"]
 > = ApiSpecGetEndpoint<Api, Endpoint>["query"][Query];
 type ApiSpecGetEndpointHeaders<
-  Api extends ReadonlyDeep<ApiSpec>,
+  Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"]
 > = ApiSpecGetEndpoint<Api, Endpoint>["headers"];
 type ApiSpecGetEndpointCookies<
-  Api extends ReadonlyDeep<ApiSpec>,
+  Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"]
 > = ApiSpecGetEndpoint<Api, Endpoint>["cookies"];
 type ApiSpecGetEndpointResponse<
-  Api extends ReadonlyDeep<ApiSpec>,
+  Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   StatusCode extends keyof ApiSpecGetEndpoint<Api, Endpoint>["responses"]
 > = ApiSpecGetEndpoint<Api, Endpoint>["responses"][StatusCode];
