@@ -1,4 +1,6 @@
 import { z } from "zod";
+import * as S from "@effect/schema/Schema";
+import { pipe } from "@effect/data/Function";
 import {
   ApiGetEndpoint,
   ApiGetEndpointBody,
@@ -10,10 +12,12 @@ import {
   ApiGetEndpointQuery,
   ApiGetEndpointResponseByStatus,
   ApiInferEndpointBody,
+  ApiInferEndpointParam,
 } from "../src/api-spec.types";
 import { makeApiSpec } from "../src/api-spec.builders";
 import { ApiZodSchema } from "../src/schema-type-zod";
 import { ApiTypeScriptSchema, tsSchema } from "../src/schema-type-ts";
+import { ApiEffectSchema } from "../src/schema-type-effect";
 
 // example of a complete API specification
 export const apiSpec = makeApiSpec({
@@ -124,13 +128,6 @@ export const apiSpec = makeApiSpec({
         204: {
           schema: z.undefined().describe("No content"),
         },
-        403: {
-          schema: z
-            .object({
-              message: z.string(),
-            })
-            .describe("Forbidden"),
-        },
       },
     },
     getAttachment: {
@@ -138,7 +135,11 @@ export const apiSpec = makeApiSpec({
       path: "/posts/:id/attachment",
       params: {
         id: {
-          schema: z.number().int().positive().describe("The ID of the post"),
+          metadata: {
+            description: "The ID of the post",
+            schemaType: ApiEffectSchema,
+          },
+          schema: S.union(pipe(S.number, S.positive()), S.undefined),
         },
       },
       responses: {
@@ -170,5 +171,8 @@ type T4 = ApiGetEndpointHeaders<typeof apiSpec, "getPosts">;
 type T5 = ApiGetEndpointCookies<typeof apiSpec, "getPosts">;
 type T6 = ApiGetEndpointResponseByStatus<typeof apiSpec, "getPosts", 200>;
 type T7 = ApiGetEndpointResponseByStatus<typeof apiSpec, "getPosts", 404>;
+
 type T8 = ApiInferEndpointBody<typeof apiSpec, "attachFile">;
+//   ^?
+type T9 = ApiInferEndpointParam<typeof apiSpec, "getAttachment", "id">;
 //   ^?

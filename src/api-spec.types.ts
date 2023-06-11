@@ -326,6 +326,22 @@ export type ApiGetEndpointBodySchemaType<
     : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
   : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>;
 
+export type ApiGetEndpointParamSchemaType<
+  Api extends ApiSpec,
+  Endpoint extends keyof Api["endpoints"],
+  PathParam extends keyof ApiGetEndpointParams<Api, Endpoint>,
+  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
+> = ApiGetEndpointParams<
+  Api,
+  Endpoint
+>[PathParam] extends infer Param extends ApiDataParameter
+  ? Param["metadata"] extends infer Meta extends ApiBaseMetadata
+    ? Meta["schemaType"] extends infer Type extends SchemaType
+      ? Type
+      : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
+    : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
+  : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>;
+
 export type ApiInferEndpointBody<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
@@ -339,6 +355,28 @@ export type ApiInferEndpointBody<
         ApiGetEndpointBodySchemaType<
           Api,
           Endpoint,
+          DefaultSchemaType
+        >["_provider"]
+      >,
+      Param["schema"]
+    >
+  : never;
+
+export type ApiInferEndpointParam<
+  Api extends ApiSpec,
+  Endpoint extends keyof Api["endpoints"],
+  PathParam extends keyof ApiGetEndpointParams<Api, Endpoint>,
+  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
+> = ApiGetEndpointParams<
+  Api,
+  Endpoint
+>[PathParam] extends infer Param extends ApiDataParameter
+  ? InferInputTypeFromSchema<
+      NonNullable<
+        ApiGetEndpointParamSchemaType<
+          Api,
+          Endpoint,
+          PathParam,
           DefaultSchemaType
         >["_provider"]
       >,

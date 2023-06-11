@@ -13,6 +13,8 @@
     "typescript": "^5.1.3"
   },
   "devDependencies": {
+    "@effect/data": "^0.12.6",
+    "@effect/schema": "^0.20.1",
     "zod": "^3.21.4"
   }
 }
