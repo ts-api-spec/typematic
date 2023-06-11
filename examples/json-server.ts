@@ -9,6 +9,7 @@ import {
   ApiGetEndpointQueries,
   ApiGetEndpointQuery,
   ApiGetEndpointResponseByStatus,
+  ApiInferEndpointBody,
 } from "../src/api-spec.types";
 import { makeApiSpec } from "../src/api-spec.builders";
 import { ApiZodSchema } from "../src/schema-type-zod";
@@ -169,3 +170,5 @@ type T4 = ApiGetEndpointHeaders<typeof apiSpec, "getPosts">;
 type T5 = ApiGetEndpointCookies<typeof apiSpec, "getPosts">;
 type T6 = ApiGetEndpointResponseByStatus<typeof apiSpec, "getPosts", 200>;
 type T7 = ApiGetEndpointResponseByStatus<typeof apiSpec, "getPosts", 404>;
+type T8 = ApiInferEndpointBody<typeof apiSpec, "attachFile">;
+//   ^?
