@@ -9,7 +9,7 @@ It will allow to define API servers, endpoints, rights, auth in a declarative wa
 - be feature complete with OpenApi
 - make it simpler to define an API spec in Typescript
 - have battle tested typescript definitions
-- have btatle tested typescript utility types to enable typesafe API parsing at compile time
+- have battle tested typescript utility types to enable typesafe API parsing at compile time
 - have a simple way to generate documentation from the spec
 - allow libraries to be created on top of this spec (eg like zodios, ts-rest)
 
