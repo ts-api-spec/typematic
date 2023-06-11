@@ -194,15 +194,25 @@ export interface ZodTypeProvider
   output: this["schema"]["_output"];
 }
 
-// typescript type of the API specification
+/**
+ * Api specification
+ */
 export interface ApiSpec {
-  metadata: ApiMetadata;
+  metadata?: ApiMetadata;
   endpoints: Record<string, ApiEndpoint>;
+  security?: ApiSecurity;
 }
 
+/**
+ * Api metadata about the available servers
+ */
 interface ApiServer {
   url: string;
-  name?: string;
+  name: string;
+}
+
+interface ApiSecurity {
+  [name: string]: unknown;
 }
 
 interface SchemaType<TypeProvider extends ApiTypeProvider = ApiTypeProvider> {
@@ -215,43 +225,136 @@ interface SchemaType<TypeProvider extends ApiTypeProvider = ApiTypeProvider> {
 }
 
 interface ApiEndpoint {
-  metadata?: EndpointMetadata;
-  method: ApiSpecMethod;
+  /**
+   * optional metadata for the endpoint
+   */
+  metadata?: ApiEndpointMetadata;
+  /**
+   * HTTP method for the endpoint
+   */
+  method: ApiMethod;
+  /**
+   * Path for the endpoint
+   */
   path: string;
+  /**
+   * Query parameters for the endpoint
+   */
   query?: Record<string, ApiParameter>;
+  /**
+   * Path parameters for the endpoint
+   */
   params?: Record<string, ApiParameter>;
+  /**
+   * Headers for the endpoint
+   */
   headers?: Record<string, ApiParameter>;
+  /**
+   * Cookies for the endpoint
+   */
   cookies?: Record<string, ApiParameter>;
+  /**
+   * Body for the endpoint
+   */
   body?: ApiDataParameter;
-  responses: Record<string | number, ApiDataParameter>;
+  /**
+   * Possible responses for the endpoint
+   * The key is the HTTP status code
+   * The key "default" is used for the default response (only use for error responses)
+   */
+  responses: {
+    [key in number | "default"]?: ApiDataParameter;
+  };
 }
 
+/**
+ * Describes any Endpoint parameter (query, path, header, cookie)
+ */
 interface ApiParameter {
+  /**
+   * optional metadata for the parameter
+   */
   metadata?: ParameterMetadata;
+  /**
+   * Schema for the parameter
+   */
   schema: unknown;
 }
 
+/**
+ * Describes the body of a request or response for an endpoint
+ */
 interface ApiDataParameter {
-  metadata?: DataMetadata;
+  /**
+   * optional metadata for the parameter
+   */
+  metadata?: ApiDataMetadata;
+  /**
+   * Schema for the request or response body
+   */
   schema: unknown;
 }
 
+/**
+ * common metadatas
+ */
 interface ApiBaseMetadata {
+  /**
+   * optional description for the associated element
+   */
   description?: string;
+  /**
+   * optionally override the default schema type for the associated element
+   * This allows to use a custom schema type for the associated element
+   * Implementations of API spec can make one or more schema handled byt default
+   */
   schemaType?: SchemaType;
 }
 
+/**
+ * API metadata
+ * This metadata is used for the documentation and the client generation
+ */
 interface ApiMetadata extends ApiBaseMetadata {
+  /**
+   * Name of the API
+   */
   name: string;
+  /**
+   * Version of the API
+   */
   version: string;
+  /**
+   * List of servers for the API
+   */
   servers?: ApiServer[];
 }
 
-interface EndpointMetadata extends ApiBaseMetadata {}
+/**
+ * Endpoint metadata
+ */
+interface ApiEndpointMetadata extends ApiBaseMetadata {
+  /**
+   * Tags can be used for grouping endpoints in the documentation
+   */
+  tags?: string[];
+  /**
+   * Resource name for the endpoint, allows to implement cache normalization
+   */
+  resource?: string;
+  /**
+   * Resource ID for the endpoint, allows to implement cache normalization
+   */
+  resourceId?: string;
+}
 
 interface ParameterMetadata extends ApiBaseMetadata {}
 
-type MediaType =
+/**
+ * Mimes types for the request or response body
+ * application/json is the default mime type
+ */
+type ApiMediaType =
   | "application/json"
   | "multipart/form-data"
   | "application/x-www-form-urlencoded"
@@ -265,7 +368,13 @@ type MediaType =
   | "image/svg+xml"
   | (string & {});
 
-type DataFormat =
+/**
+ * Data format for the request or response body
+ * json is the default format
+ * All other formats can be used for example for file upload/download
+ * and are the ones supported by the browser Fetch API
+ */
+type ApiDataFormat =
   | "json"
   | "text"
   | "form-data"
@@ -274,21 +383,40 @@ type DataFormat =
   | "array-buffer"
   | "readable-stream";
 
-type ApiSpecMethod =
+/**
+ * Supported HTTP methods
+ */
+type ApiMethod =
   | "get"
   | "post"
   | "put"
   | "patch"
   | "delete"
+  | "head"
+  | "options"
   | "GET"
   | "POST"
   | "PUT"
   | "PATCH"
-  | "DELETE";
+  | "DELETE"
+  | "HEAD"
+  | "OPTIONS";
 
-interface DataMetadata extends ApiBaseMetadata {
-  contentType?: MediaType; // default to application/json
-  format?: DataFormat; // default to json
+/**
+ * Metadata for the request or response body
+ * This metadata is used for the documentation and the client/server generation
+ */
+interface ApiDataMetadata extends ApiBaseMetadata {
+  /**
+   * Content type for the request or response body
+   * application/json is the default content type
+   */
+  contentType?: ApiMediaType; // default to application/json
+  /**
+   * Data format for the request or response body
+   * json is the default format
+   */
+  format?: ApiDataFormat;
 }
 
 export type ApiSpecGetEndpoint<
@@ -298,7 +426,7 @@ export type ApiSpecGetEndpoint<
 
 type ApiSpecGetPathsByMethod<
   Api extends ReadonlyDeep<ApiSpec>,
-  Method extends ApiSpecMethod
+  Method extends ApiMethod
 > = {
   [Endpoint in keyof Api["endpoints"]]: ApiSpecGetEndpoint<
     Api,
@@ -310,7 +438,7 @@ type ApiSpecGetPathsByMethod<
 
 export type ApiSpecGetEndpointByPath<
   Api extends ReadonlyDeep<ApiSpec>,
-  Method extends ApiSpecMethod,
+  Method extends ApiMethod,
   Path extends ApiSpecGetPathsByMethod<Api, Method>
 > = {
   [Endpoint in keyof Api["endpoints"]]: ApiSpecGetEndpoint<
