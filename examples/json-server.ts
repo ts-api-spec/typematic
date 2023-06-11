@@ -110,11 +110,19 @@ export const apiSpec = makeApiSpec({
     attachFile: {
       method: "POST",
       path: "/posts/:id/attachment",
+      // we can use the schema directly if no need for metadata
       params: {
-        id: {
-          schema: z.number().int().positive().describe("The ID of the post"),
-        },
+        id: z.number().int().positive().describe("The ID of the post"),
       },
+      // or we can use a plain object with metadata
+      // params: {
+      //   id: {
+      //     metadata: {
+      //       description: "The ID of the post",
+      //     },
+      //     schema: z.number().int().positive(),
+      //   }
+      // },
       body: {
         metadata: {
           description: "The file to attach",

@@ -38,31 +38,36 @@ interface ApiEndpoint {
   readonly path: string;
   /**
    * Query parameters for the endpoint
+   * a record of schemas or a record of api parameters
    */
-  readonly query?: Record<string, ApiParameter>;
+  readonly query?: Record<string, ApiParameter | {}>;
   /**
    * Path parameters for the endpoint
+   * a record of schemas or a record of api parameters
    */
-  readonly params?: Record<string, ApiParameter>;
+  readonly params?: Record<string, ApiParameter | {}>;
   /**
    * Headers for the endpoint
+   * a record of schemas or a record of api parameters
    */
-  readonly headers?: Record<string, ApiParameter>;
+  readonly headers?: Record<string, ApiParameter | {}>;
   /**
    * Cookies for the endpoint
+   * a record of schemas or a record of api parameters
    */
-  readonly cookies?: Record<string, ApiParameter>;
+  readonly cookies?: Record<string, ApiParameter | {}>;
   /**
    * Body for the endpoint
+   * can be a schema or an api data parameter
    */
-  readonly body?: ApiDataParameter;
+  readonly body?: ApiDataParameter | {};
   /**
    * Possible responses for the endpoint
    * The key is the HTTP status code
    * The key "default" is used for the default response (only use for error responses)
    */
   readonly responses: {
-    readonly [key in number | "default"]?: ApiDataParameter;
+    readonly [key in number | "default"]?: ApiDataParameter | {};
   };
 }
 
@@ -360,7 +365,12 @@ export type ApiInferEndpointBody<
       >,
       Param["schema"]
     >
-  : never;
+  : InferInputTypeFromSchema<
+      NonNullable<
+        ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>["_provider"]
+      >,
+      ApiGetEndpointBody<Api, Endpoint>
+    >;
 
 export type ApiInferEndpointParam<
   Api extends ApiSpec,
