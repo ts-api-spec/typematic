@@ -176,3 +176,5 @@ type T8 = ApiInferEndpointBody<typeof apiSpec, "attachFile">; // schema with zod
 //   ^?
 type T9 = ApiInferEndpointParam<typeof apiSpec, "getAttachment", "id">; // schema with @effect/schema
 //   ^?
+type T10 = ApiInferEndpointParam<typeof apiSpec, "getPost", "id">; // schema with typescript
+//   ^?
