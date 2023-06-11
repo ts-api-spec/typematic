@@ -139,7 +139,7 @@ export const apiSpec = makeApiSpec({
             description: "The ID of the post",
             schemaType: ApiEffectSchema,
           },
-          schema: S.union(pipe(S.number, S.positive()), S.undefined),
+          schema: S.union(pipe(S.number, S.positive()), S.undefined), // we can mix any schema type if we specify it in the metadata
         },
       },
       responses: {
@@ -172,7 +172,7 @@ type T5 = ApiGetEndpointCookies<typeof apiSpec, "getPosts">;
 type T6 = ApiGetEndpointResponseByStatus<typeof apiSpec, "getPosts", 200>;
 type T7 = ApiGetEndpointResponseByStatus<typeof apiSpec, "getPosts", 404>;
 
-type T8 = ApiInferEndpointBody<typeof apiSpec, "attachFile">;
+type T8 = ApiInferEndpointBody<typeof apiSpec, "attachFile">; // schema with zod
 //   ^?
-type T9 = ApiInferEndpointParam<typeof apiSpec, "getAttachment", "id">;
+type T9 = ApiInferEndpointParam<typeof apiSpec, "getAttachment", "id">; // schema with @effect/schema
 //   ^?
