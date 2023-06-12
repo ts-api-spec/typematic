@@ -10,11 +10,12 @@ import {
   ApiGetEndpointParams,
   ApiGetEndpointQueries,
   ApiGetEndpointQuery,
-  ApiGetEndpointResponseByStatus,
+  ApiGetEndpointResponse,
 } from "../src/basic-utilities.types";
 import {
   ApiInferEndpointBody,
   ApiInferEndpointParam,
+  ApiInferEndpointQuery,
 } from "../src/infer-utilities.types";
 import { makeApiSpec } from "../src/api-spec.builders";
 import { ApiZodSchema } from "../src/schema-type-zod";
@@ -173,15 +174,27 @@ export const apiSpec = makeApiSpec({
 });
 
 type T0 = ApiGetEndpoint<typeof apiSpec, "getPosts">;
+//   ^?
 type T1 = ApiGetEndpointBody<typeof apiSpec, "getPosts">;
+//   ^?
 type T2 = ApiGetEndpointParams<typeof apiSpec, "getPosts">;
+//   ^?
 type T3 = ApiGetEndpointQueries<typeof apiSpec, "getPosts">;
+//   ^?
 type T3_1 = ApiGetEndpointQuery<typeof apiSpec, "getPosts", "userId">;
+//   ^?
 type T4 = ApiGetEndpointHeaders<typeof apiSpec, "getPosts">;
+//   ^?
 type T5 = ApiGetEndpointCookies<typeof apiSpec, "getPosts">;
-type T6 = ApiGetEndpointResponseByStatus<typeof apiSpec, "getPosts", 200>;
-type T7 = ApiGetEndpointResponseByStatus<typeof apiSpec, "getPosts", 404>;
+//   ^?
+type T6 = ApiGetEndpointResponse<typeof apiSpec, "getPosts", 200>;
+//   ^?
+type T7 = ApiGetEndpointResponse<typeof apiSpec, "getPosts", 404>;
+//   ^?
 
+/**
+ * Infer schema types
+ */
 type T8 = ApiInferEndpointBody<typeof apiSpec, "attachFile">; // schema with zod
 //   ^?
 type T9 = ApiInferEndpointParam<typeof apiSpec, "getAttachment", "id">; // schema with @effect/schema
@@ -189,4 +202,8 @@ type T9 = ApiInferEndpointParam<typeof apiSpec, "getAttachment", "id">; // schem
 type T10 = ApiInferEndpointParam<typeof apiSpec, "getPost", "id">; // schema with typescript
 //   ^?
 type T11 = ApiInferEndpointParam<typeof apiSpec, "attachFile", "id">; // direct schema without metadata
+//   ^?
+type T12 = ApiInferEndpointQuery<typeof apiSpec, "getPosts", "userId">; // schema with zod
+//   ^?
+type T13 = ApiInferEndpointQuery<typeof apiSpec, "getPosts", "id">; // schema with typescript
 //   ^?

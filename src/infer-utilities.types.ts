@@ -8,7 +8,10 @@ import type {
 import type {
   ApiGetEndpoint,
   ApiGetEndpointBody,
+  ApiGetEndpointParam,
   ApiGetEndpointParams,
+  ApiGetEndpointQueries,
+  ApiGetEndpointQuery,
 } from "./basic-utilities.types";
 import type { InferInputTypeFromSchema, SchemaType } from "./schema-type.types";
 import { ApiTypeScriptSchema } from "./schema-type-ts";
@@ -56,7 +59,23 @@ export type ApiGetEndpointParamSchemaType<
 > = ApiGetEndpointParams<
   Api,
   Endpoint
->[PathParam] extends infer Param extends ApiDataParameter
+>[PathParam] extends infer Param extends ApiParameter
+  ? Param["metadata"] extends infer Meta extends ApiBaseMetadata
+    ? Meta["schemaType"] extends infer Type extends SchemaType
+      ? Type
+      : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
+    : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
+  : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>;
+
+export type ApiGetEndpointQuerySchemaType<
+  Api extends ApiSpec,
+  Endpoint extends keyof Api["endpoints"],
+  QueryParam extends keyof ApiGetEndpointQueries<Api, Endpoint>,
+  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
+> = ApiGetEndpointQueries<
+  Api,
+  Endpoint
+>[QueryParam] extends infer Param extends ApiParameter
   ? Param["metadata"] extends infer Meta extends ApiBaseMetadata
     ? Meta["schemaType"] extends infer Type extends SchemaType
       ? Type
@@ -94,7 +113,7 @@ export type ApiInferEndpointParam<
   Endpoint extends keyof Api["endpoints"],
   PathParam extends keyof ApiGetEndpointParams<Api, Endpoint>,
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
-  ComputedParam = ApiGetEndpointParams<Api, Endpoint>[PathParam]
+  ComputedParam = ApiGetEndpointParam<Api, Endpoint, PathParam>
 > = ComputedParam extends ApiParameter
   ? InferInputTypeFromSchema<
       NonNullable<
@@ -117,4 +136,34 @@ export type ApiInferEndpointParam<
         >["_provider"]
       >,
       ComputedParam
+    >;
+
+export type ApiInferEndpointQuery<
+  Api extends ApiSpec,
+  Endpoint extends keyof Api["endpoints"],
+  QueryParam extends keyof ApiGetEndpointQueries<Api, Endpoint>,
+  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
+  ComputedQuery = ApiGetEndpointQuery<Api, Endpoint, QueryParam>
+> = ComputedQuery extends ApiParameter
+  ? InferInputTypeFromSchema<
+      NonNullable<
+        ApiGetEndpointQuerySchemaType<
+          Api,
+          Endpoint,
+          QueryParam,
+          DefaultSchemaType
+        >["_provider"]
+      >,
+      ComputedQuery["schema"]
+    >
+  : InferInputTypeFromSchema<
+      NonNullable<
+        ApiGetEndpointQuerySchemaType<
+          Api,
+          Endpoint,
+          QueryParam,
+          DefaultSchemaType
+        >["_provider"]
+      >,
+      ComputedQuery
     >;

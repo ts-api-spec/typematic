@@ -83,7 +83,7 @@ export type ApiGetEndpointResponses<
   Endpoint extends keyof Api["endpoints"]
 > = ApiGetEndpoint<Api, Endpoint>["responses"];
 
-export type ApiGetEndpointResponseByStatus<
+export type ApiGetEndpointResponse<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   StatusCode extends keyof ApiGetEndpoint<Api, Endpoint>["responses"]
