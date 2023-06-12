@@ -11,9 +11,11 @@ import {
   ApiGetEndpointQueries,
   ApiGetEndpointQuery,
   ApiGetEndpointResponseByStatus,
+} from "../src/basic-utilities.types";
+import {
   ApiInferEndpointBody,
   ApiInferEndpointParam,
-} from "../src/basic-utilities.types";
+} from "../src/infer-utilities.types";
 import { makeApiSpec } from "../src/api-spec.builders";
 import { ApiZodSchema } from "../src/schema-type-zod";
 import { ApiTypeScriptSchema, tsSchema } from "../src/schema-type-ts";
