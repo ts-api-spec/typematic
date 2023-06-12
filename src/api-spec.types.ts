@@ -1,6 +1,4 @@
-import { ApiTypeScriptSchema } from "./schema-type-ts";
-import { ApiZodSchema } from "./schema-type-zod";
-import type { InferInputTypeFromSchema, SchemaType } from "./schema-type.types";
+import type { SchemaType } from "./schema-type.types";
 
 /**
  * Api specification
