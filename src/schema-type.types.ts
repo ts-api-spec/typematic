@@ -23,10 +23,9 @@ export interface ApiTypeProvider<Schema = unknown> {
  * @param Schema - The schema to resolve
  * @returns - the typescript input type for the provided schema
  */
-export type InferInputTypeFromSchema<
-  TypeProvider extends ApiTypeProvider,
-  Schema
-> = (TypeProvider & { schema: Schema })["input"];
+export type InferInputTypeFromSchema<TypeProvider extends ApiTypeProvider, Schema> = (TypeProvider & {
+  schema: Schema;
+})["input"];
 
 /**
  * Infer the output type from a schema using the type provider
@@ -34,18 +33,15 @@ export type InferInputTypeFromSchema<
  * @param Schema - The schema to resolve
  * @returns - the typescript output type for the provided schema
  */
-export type InferOutputTypeFromSchema<
-  TypeProvider extends ApiTypeProvider,
-  Schema
-> = (TypeProvider & { schema: Schema })["output"];
+export type InferOutputTypeFromSchema<TypeProvider extends ApiTypeProvider, Schema> = (TypeProvider & {
+  schema: Schema;
+})["output"];
 
 /**
  * Interface for runtime schema validation
  * This is used as a common return type for all schema validation adapters
  */
-export type SchemaValidationResult =
-  | { success: true; data: any }
-  | { success: false; error: any };
+export type SchemaValidationResult = { success: true; data: any } | { success: false; error: any };
 
 /**
  * Schema Type interface
@@ -55,13 +51,8 @@ export type SchemaValidationResult =
  *
  * @param TypeProvider - The type provider for the schema type
  */
-export interface SchemaType<
-  TypeProvider extends ApiTypeProvider = ApiTypeProvider
-> {
+export interface SchemaType<TypeProvider extends ApiTypeProvider = ApiTypeProvider> {
   readonly _provider?: TypeProvider;
   validate: (schema: any, input: unknown) => SchemaValidationResult;
-  validateAsync: (
-    schema: any,
-    input: unknown
-  ) => Promise<SchemaValidationResult>;
+  validateAsync: (schema: any, input: unknown) => Promise<SchemaValidationResult>;
 }

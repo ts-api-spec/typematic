@@ -1,8 +1,4 @@
-import {
-  SchemaValidationResult,
-  ApiTypeProvider,
-  SchemaType,
-} from "./schema-type.types";
+import { SchemaValidationResult, ApiTypeProvider, SchemaType } from "./schema-type.types";
 
 const genericTsSchema = {
   parse: (data: unknown): SchemaValidationResult => ({
@@ -27,9 +23,7 @@ export const tsSchema = <Schema>(): TsSchema<Schema> => genericTsSchema as any;
  * @param throwingValidator - a function that throws if the input is invalid and returns the output type if the input is valid
  * @returns - a schema that can be used with the `tsTypeProvider`
  */
-export const tsFnSchema = <Schema>(
-  throwingValidator: (data: unknown) => Schema
-): TsSchema<Schema> => ({
+export const tsFnSchema = <Schema>(throwingValidator: (data: unknown) => Schema): TsSchema<Schema> => ({
   _schema: undefined as Schema,
   parse: (data: unknown): SchemaValidationResult => {
     try {
