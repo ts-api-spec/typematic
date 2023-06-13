@@ -13,7 +13,7 @@ import {
   ApiGetEndpointResponse,
 } from "../src/basic-utilities.types";
 import {
-  ApiInferEndpointBody,
+  ApiInferEndpointInputBody,
   ApiInferEndpointInputParam,
   ApiInferEndpointInputQuery,
 } from "../src/infer-utilities.types";
@@ -195,7 +195,7 @@ type T7 = ApiGetEndpointResponse<typeof apiSpec, "getPosts", 404>;
 /**
  * Infer schema types
  */
-type T8 = ApiInferEndpointBody<typeof apiSpec, "attachFile">; // schema with zod
+type T8 = ApiInferEndpointInputBody<typeof apiSpec, "attachFile">; // schema with zod
 //   ^?
 type T9 = ApiInferEndpointInputParam<typeof apiSpec, "getAttachment", "id">; // schema with @effect/schema
 //   ^?

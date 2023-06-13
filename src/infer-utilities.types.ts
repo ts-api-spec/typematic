@@ -101,14 +101,39 @@ export type ApiGetEndpointEntrySchemaType<
  * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint body
  */
-export type ApiInferEndpointBody<
+export type ApiInferEndpointInputBody<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
-  $SchemaType extends SchemaType = ApiGetEndpointBodySchemaType<Api, Endpoint, DefaultSchemaType>
-> = ApiGetEndpointBody<Api, Endpoint> extends infer $Body extends ApiDataParameter
+  $SchemaType extends SchemaType = ApiGetEndpointBodySchemaType<Api, Endpoint, DefaultSchemaType>,
+  $Body = ApiGetEndpointBody<Api, Endpoint>
+> = $Body extends ApiDataParameter
   ? InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body["schema"]>
-  : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, ApiGetEndpointBody<Api, Endpoint>>;
+  : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>;
+
+/**
+ * Infer the typescript output type for an endpoint body
+ * output type is the data type that is returned after validating the endpoint body
+ * Use SchemaType cascading rules to determine the schema type to use
+ * Cascading rules:
+ * 1. If the body has a schema type defined, use it
+ * 2. Else if the endpoint has a schema type defined, use it
+ * 3. Else if the api spec has a schema type defined, use it
+ * 4. Else use the default schema type
+ * @param Api - Api spec
+ * @param Endpoint - Endpoint name
+ * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
+ * @returns Typescript Output type for the endpoint body
+ */
+export type ApiInferEndpointOutputBody<
+  Api extends ApiSpec,
+  Endpoint extends keyof Api["endpoints"],
+  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
+  $SchemaType extends SchemaType = ApiGetEndpointBodySchemaType<Api, Endpoint, DefaultSchemaType>,
+  $Body = ApiGetEndpointBody<Api, Endpoint>
+> = $Body extends ApiDataParameter
+  ? InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body["schema"]>
+  : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>;
 
 /**
  * Infer the typescript input type for an endpoint entry (path, query, header, cookie, response)
