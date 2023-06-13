@@ -21,6 +21,11 @@ export interface ApiSecurity {
   readonly [name: string]: unknown;
 }
 
+/**
+ * API entries that have record of schemas or api parameters
+ */
+export type ApiEntry = "query" | "params" | "headers" | "cookies" | "responses";
+
 export interface ApiEndpoint {
   /**
    * optional metadata for the endpoint
@@ -76,7 +81,7 @@ export interface ApiParameter {
   /**
    * optional metadata for the parameter
    */
-  readonly metadata?: ParameterMetadata;
+  readonly metadata?: ApiParameterMetadata;
   /**
    * Schema for the parameter
    */
@@ -150,7 +155,7 @@ export interface ApiEndpointMetadata extends ApiBaseMetadata {
   readonly resourceId?: string;
 }
 
-export interface ParameterMetadata extends ApiBaseMetadata {}
+export interface ApiParameterMetadata extends ApiBaseMetadata {}
 
 /**
  * Mimes types for the request or response body

@@ -14,8 +14,8 @@ import {
 } from "../src/basic-utilities.types";
 import {
   ApiInferEndpointBody,
-  ApiInferEndpointParam,
-  ApiInferEndpointQuery,
+  ApiInferEndpointInputParam,
+  ApiInferEndpointInputQuery,
 } from "../src/infer-utilities.types";
 import { makeApiSpec } from "../src/api-spec.builders";
 import { ApiZodSchema } from "../src/schema-type-zod";
@@ -197,13 +197,13 @@ type T7 = ApiGetEndpointResponse<typeof apiSpec, "getPosts", 404>;
  */
 type T8 = ApiInferEndpointBody<typeof apiSpec, "attachFile">; // schema with zod
 //   ^?
-type T9 = ApiInferEndpointParam<typeof apiSpec, "getAttachment", "id">; // schema with @effect/schema
+type T9 = ApiInferEndpointInputParam<typeof apiSpec, "getAttachment", "id">; // schema with @effect/schema
 //   ^?
-type T10 = ApiInferEndpointParam<typeof apiSpec, "getPost", "id">; // schema with typescript
+type T10 = ApiInferEndpointInputParam<typeof apiSpec, "getPost", "id">; // schema with typescript
 //   ^?
-type T11 = ApiInferEndpointParam<typeof apiSpec, "attachFile", "id">; // direct schema without metadata
+type T11 = ApiInferEndpointInputParam<typeof apiSpec, "attachFile", "id">; // direct schema without metadata
 //   ^?
-type T12 = ApiInferEndpointQuery<typeof apiSpec, "getPosts", "userId">; // schema with zod
+type T12 = ApiInferEndpointInputQuery<typeof apiSpec, "getPosts", "userId">; // schema with zod
 //   ^?
-type T13 = ApiInferEndpointQuery<typeof apiSpec, "getPosts", "id">; // schema with typescript
+type T13 = ApiInferEndpointInputQuery<typeof apiSpec, "getPosts", "id">; // schema with typescript
 //   ^?
