@@ -27,9 +27,9 @@ import { ApiTypeScriptSchema } from "./schema-type-ts";
 export type ApiGetSchemaType<
   Api extends ApiSpec,
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = Api["metadata"] extends infer Meta extends ApiBaseMetadata
-  ? Meta["schemaType"] extends infer Type extends SchemaType
-    ? Type
+> = Api["metadata"] extends infer $Metadata extends ApiBaseMetadata
+  ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
+    ? $SchemaType
     : DefaultSchemaType
   : DefaultSchemaType;
 
@@ -46,10 +46,10 @@ export type ApiGetEndpointSchemaType<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
-  ComputedEndpoint extends ApiEndpoint = ApiGetEndpoint<Api, Endpoint>
-> = ComputedEndpoint["metadata"] extends infer Meta extends ApiBaseMetadata
-  ? Meta["schemaType"] extends infer Type extends SchemaType
-    ? Type
+  $Endpoint extends ApiEndpoint = ApiGetEndpoint<Api, Endpoint>
+> = $Endpoint["metadata"] extends infer $Metadata extends ApiBaseMetadata
+  ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
+    ? $SchemaType
     : ApiGetSchemaType<Api, DefaultSchemaType>
   : ApiGetSchemaType<Api, DefaultSchemaType>;
 
@@ -70,10 +70,10 @@ export type ApiGetEndpointBodySchemaType<
 > = ApiGetEndpointBody<
   Api,
   Endpoint
-> extends infer Param extends ApiDataParameter
-  ? Param["metadata"] extends infer Meta extends ApiBaseMetadata
-    ? Meta["schemaType"] extends infer Type extends SchemaType
-      ? Type
+> extends infer $Body extends ApiDataParameter
+  ? $Body["metadata"] extends infer $Metadata extends ApiBaseMetadata
+    ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
+      ? $SchemaType
       : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
     : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
   : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>;
@@ -99,10 +99,10 @@ export type ApiGetEndpointEntrySchemaType<
 > = ApiGetEndpoint<
   Api,
   Endpoint
->[Entry][EntryParam] extends infer Param extends ApiParameter
-  ? Param["metadata"] extends infer Meta extends ApiBaseMetadata
-    ? Meta["schemaType"] extends infer Type extends SchemaType
-      ? Type
+>[Entry][EntryParam] extends infer $Entry extends ApiParameter
+  ? $Entry["metadata"] extends infer $Metadata extends ApiBaseMetadata
+    ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
+      ? $SchemaType
       : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
     : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
   : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>;
@@ -124,25 +124,22 @@ export type ApiGetEndpointEntrySchemaType<
 export type ApiInferEndpointBody<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
+  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
+  $SchemaType extends SchemaType = ApiGetEndpointBodySchemaType<
+    Api,
+    Endpoint,
+    DefaultSchemaType
+  >
 > = ApiGetEndpointBody<
   Api,
   Endpoint
-> extends infer Param extends ApiDataParameter
+> extends infer $Body extends ApiDataParameter
   ? InferInputTypeFromSchema<
-      NonNullable<
-        ApiGetEndpointBodySchemaType<
-          Api,
-          Endpoint,
-          DefaultSchemaType
-        >["_provider"]
-      >,
-      Param["schema"]
+      NonNullable<$SchemaType["_provider"]>,
+      $Body["schema"]
     >
   : InferInputTypeFromSchema<
-      NonNullable<
-        ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>["_provider"]
-      >,
+      NonNullable<$SchemaType["_provider"]>,
       ApiGetEndpointBody<Api, Endpoint>
     >;
 
@@ -168,31 +165,22 @@ export type ApiInferEndpointInputEntry<
   Entry extends ApiEntry,
   EntryParam extends keyof ApiGetEndpoint<Api, Endpoint>[Entry],
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
-  ComputedEntryParam = ApiGetEndpoint<Api, Endpoint>[Entry][EntryParam]
-> = ComputedEntryParam extends ApiParameter
+  $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaType<
+    Api,
+    Endpoint,
+    Entry,
+    EntryParam,
+    DefaultSchemaType
+  >,
+  $EntryParam = ApiGetEndpoint<Api, Endpoint>[Entry][EntryParam]
+> = $EntryParam extends ApiParameter
   ? InferInputTypeFromSchema<
-      NonNullable<
-        ApiGetEndpointEntrySchemaType<
-          Api,
-          Endpoint,
-          Entry,
-          EntryParam,
-          DefaultSchemaType
-        >["_provider"]
-      >,
-      ComputedEntryParam["schema"]
+      NonNullable<$SchemaType["_provider"]>,
+      $EntryParam["schema"]
     >
   : InferInputTypeFromSchema<
-      NonNullable<
-        ApiGetEndpointEntrySchemaType<
-          Api,
-          Endpoint,
-          Entry,
-          EntryParam,
-          DefaultSchemaType
-        >["_provider"]
-      >,
-      ComputedEntryParam
+      NonNullable<$SchemaType["_provider"]>,
+      $EntryParam
     >;
 
 /**
@@ -217,31 +205,22 @@ export type ApiInferEndpointOutputEntry<
   Entry extends ApiEntry,
   EntryParam extends keyof ApiGetEndpoint<Api, Endpoint>[Entry],
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
-  ComputedEntryParam = ApiGetEndpoint<Api, Endpoint>[Entry][EntryParam]
-> = ComputedEntryParam extends ApiParameter
+  $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaType<
+    Api,
+    Endpoint,
+    Entry,
+    EntryParam,
+    DefaultSchemaType
+  >,
+  $EntryParam = ApiGetEndpoint<Api, Endpoint>[Entry][EntryParam]
+> = $EntryParam extends ApiParameter
   ? InferOutputTypeFromSchema<
-      NonNullable<
-        ApiGetEndpointEntrySchemaType<
-          Api,
-          Endpoint,
-          Entry,
-          EntryParam,
-          DefaultSchemaType
-        >["_provider"]
-      >,
-      ComputedEntryParam["schema"]
+      NonNullable<$SchemaType["_provider"]>,
+      $EntryParam["schema"]
     >
   : InferOutputTypeFromSchema<
-      NonNullable<
-        ApiGetEndpointEntrySchemaType<
-          Api,
-          Endpoint,
-          Entry,
-          EntryParam,
-          DefaultSchemaType
-        >["_provider"]
-      >,
-      ComputedEntryParam
+      NonNullable<$SchemaType["_provider"]>,
+      $EntryParam
     >;
 
 /**
