@@ -1,5 +1,5 @@
 import type { ApiBaseMetadata, ApiDataParameter, ApiEndpoint, ApiEntry, ApiParameter, ApiSpec } from "./api-spec.types";
-import type { ApiGetEndpoint, ApiGetEndpointBody } from "./basic-utilities.types";
+import type { ApiGetEndpoint, ApiGetEndpointBody } from "./endpoint-utilities.types";
 import type { InferInputTypeFromSchema, InferOutputTypeFromSchema, SchemaType } from "./schema-type.types";
 import { ApiTypeScriptSchema } from "./schema-type-ts";
 

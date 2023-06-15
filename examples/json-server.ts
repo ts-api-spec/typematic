@@ -11,7 +11,7 @@ import {
   ApiGetEndpointQueries,
   ApiGetEndpointQuery,
   ApiGetEndpointResponse,
-} from "../src/basic-utilities.types";
+} from "../src/endpoint-utilities.types";
 import {
   ApiInferEndpointInputBody,
   ApiInferEndpointInputParam,
