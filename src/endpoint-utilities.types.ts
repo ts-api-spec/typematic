@@ -1,6 +1,6 @@
 import type { ApiSpec, ApiMethod, ApiDataParameter, ApiParameter } from "./api-spec.types";
 
-type ApiGetPathsByMethod<Api extends ApiSpec, Method extends ApiMethod> = {
+export type ApiGetPathsByMethod<Api extends ApiSpec, Method extends ApiMethod> = {
   [Endpoint in keyof Api["endpoints"]]: ApiGetEndpoint<Api, Endpoint>["method"] extends
     | Lowercase<Method>
     | Uppercase<Method>
