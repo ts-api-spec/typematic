@@ -1,5 +1,119 @@
-import { ApiSpec } from "./api-spec.types";
+import { z } from "zod";
+import { ApiEndpoint, ApiMetadata, ApiSpec } from "./api-spec.types";
+import { ApiZodSchema } from "./schema-type-zod";
+import { ApiTypeScriptSchema, tsSchema } from "./schema-type-ts";
+import { ApiInferEndpointOutputResponse } from "./infer-utilities.types";
 
 export function makeApiSpec<const T extends ApiSpec>(spec: T): T {
   return spec;
+}
+
+type Simplify<T> = { [K in keyof T]: T[K] } & {};
+
+export class ApiSpecBuilder<Metadata extends ApiMetadata | undefined, Endpoints extends ApiSpec["endpoints"] = {}> {
+  private spec: ApiSpec = {
+    endpoints: {},
+  };
+
+  constructor(metadata?: Metadata) {
+    // @ts-expect-error we are in the constructor, we can mutate the spec
+    this.spec.metadata = metadata;
+  }
+
+  addEndpoint<Alias extends string, const Endpoint extends ApiEndpoint>(
+    name: Alias,
+    endpoint: Endpoint
+  ): ApiSpecBuilder<
+    Metadata,
+    Simplify<
+      Endpoints & {
+        [key in Alias]: Endpoint;
+      }
+    >
+  > {
+    this.spec.endpoints[name] = endpoint;
+    return this as any;
+  }
+
+  build(): Metadata extends undefined
+    ? {
+        endpoints: Endpoints;
+      }
+    : {
+        metadata: Metadata;
+        endpoints: Endpoints;
+      } {
+    return this.spec as any;
+  }
+}
+
+/**
+ * Build an api spec with builder pattern
+ * @example
+ * ```ts
+ * const apiSpec = apiSpecBuilder({
+ *   name: "my-api",
+ *   version: "1.0.0",
+ *   description: "My API description",
+ *   servers: [
+ *     {
+ *       url: "http://localhost:3000",
+ *       name: "development",
+ *     },
+ *     {
+ *       url: "https://jsonplaceholder.typicode.com",
+ *       name: "production",
+ *     },
+ *   ],
+ *   schemaType: ApiZodSchema, // optional, allows to specify the schema adapter to use, for all shemas in definitions, default to ApiTypesriptSchema
+ * })
+ * .addEndpoint('getPosts', {
+ *     metadata: {
+ *       description: "Get all posts",
+ *       schemaType: ApiTypeScriptSchema, // override the parent defined schema adapter (ZodSchemaAdapter)
+ *     },
+ *     method: "GET",
+ *     path: "/posts",
+ *     query: {
+ *       userId: {
+ *         metadata: {
+ *           description: "The ID of the user", // allows to add a description to the parameter for the documentation outside of the schema
+ *           schemaType: ApiZodSchema, // override the parent defined schema adapter (TypeScriptSchemaAdapter)
+ *         },
+ *         schema: z.number().optional(), // zod schema since the schema adapter is ZodSchemaAdapter
+ *       },
+ *       id: {
+ *         metadata: {
+ *           description: "The ID of the post",
+ *         },
+ *         schema: tsSchema<number>(), // typescript schema since the schema adapter is TypeScriptSchemaAdapter
+ *       },
+ *     },
+ *     responses: {
+ *       200: {
+ *         schema: z.array(
+ *           z.object({
+ *             userId: z.number(),
+ *             id: z.number(),
+ *             title: z.string(),
+ *             body: z.string(),
+ *           })
+ *         ),
+ *       },
+ *       404: {
+ *         schema: z
+ *           .object({
+ *             message: z.string(),
+ *           })
+ *           .describe("Not found"),
+ *       },
+ *     },
+ *   })
+ *   .build()
+ * ```
+ */
+export function apiSpecBuilder(): ApiSpecBuilder<undefined>;
+export function apiSpecBuilder<const Metadata extends ApiMetadata>(metadata: Metadata): ApiSpecBuilder<Metadata>;
+export function apiSpecBuilder<Metadata extends ApiMetadata | undefined>(metadata?: Metadata) {
+  return new ApiSpecBuilder(metadata);
 }
