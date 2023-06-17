@@ -1,14 +1,9 @@
-import { z } from "zod";
 import { ApiEndpoint, ApiMetadata, ApiSpec } from "./api-spec.types";
-import { ApiZodSchema } from "./schema-type-zod";
-import { ApiTypeScriptSchema, tsSchema } from "./schema-type-ts";
-import { ApiInferEndpointOutputResponse } from "./infer-utilities.types";
+import { Merge } from "./utils.types";
 
 export function makeApiSpec<const T extends ApiSpec>(spec: T): T {
   return spec;
 }
-
-type Simplify<T> = { [K in keyof T]: T[K] } & {};
 
 export class ApiSpecBuilder<Metadata extends ApiMetadata | undefined, Endpoints extends ApiSpec["endpoints"] = {}> {
   private spec: ApiSpec = {
@@ -21,12 +16,13 @@ export class ApiSpecBuilder<Metadata extends ApiMetadata | undefined, Endpoints 
   }
 
   addEndpoint<Alias extends string, const Endpoint extends ApiEndpoint>(
-    name: Alias,
+    name: Alias extends keyof Endpoints ? `Error: '${Alias}' is already defined` : Alias,
     endpoint: Endpoint
   ): ApiSpecBuilder<
     Metadata,
-    Simplify<
-      Endpoints & {
+    Merge<
+      Endpoints,
+      {
         [key in Alias]: Endpoint;
       }
     >
