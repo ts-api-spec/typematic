@@ -23,25 +23,8 @@ import { ApiTypeScriptSchema, tsSchema } from "../src/schema-type-ts";
 import { ApiEffectSchema } from "../src/schema-type-effect";
 
 // example of a complete API specification
-export const apiSpec = makeApiSpec({
-  metadata: {
-    name: "my-api",
-    version: "1.0.0",
-    description: "My API description",
-    servers: [
-      {
-        url: "http://localhost:3000",
-        name: "development",
-      },
-      {
-        url: "https://jsonplaceholder.typicode.com",
-        name: "production",
-      },
-    ],
-    schemaType: ApiZodSchema, // optional, allows to specify the schema adapter to use, for all shemas in definitions, default to "zod"
-  },
-  // endpoints with aliases
-  endpoints: {
+export const apiSpec = makeApiSpec(
+  {
     getPosts: {
       metadata: {
         description: "Get all posts",
@@ -171,7 +154,23 @@ export const apiSpec = makeApiSpec({
       },
     },
   },
-});
+  {
+    name: "my-api",
+    version: "1.0.0",
+    description: "My API description",
+    servers: [
+      {
+        url: "http://localhost:3000",
+        name: "development",
+      },
+      {
+        url: "https://jsonplaceholder.typicode.com",
+        name: "production",
+      },
+    ],
+    schemaType: ApiZodSchema, // optional, allows to specify the schema adapter to use, for all shemas in definitions, default to "zod"
+  }
+);
 
 type T0 = ApiGetEndpoint<typeof apiSpec, "getPosts">;
 //   ^?

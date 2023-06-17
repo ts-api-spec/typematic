@@ -1,10 +1,45 @@
 import { ApiEndpoint, ApiMetadata, ApiSpec } from "./api-spec.types";
 import { Merge } from "./utils.types";
 
-export function makeApiSpec<const T extends ApiSpec>(spec: T): T {
-  return spec;
+/**
+ * create an api spec
+ * @param spec - the api spec to infer
+ * @returns - the api spec inferred
+ * @example
+ * ```ts
+ * const apiSpec = makeApiSpec({
+ *  getPosts: {
+ *    method: 'GET',
+ *    path: '/posts',
+ *    responses: {
+ *      200: z.array(postSchema),
+ *    },
+ *  },
+ * });
+ * ```
+ */
+export function makeApiSpec<const Endpoints extends Record<string, ApiEndpoint>>(
+  endpoints: Endpoints
+): { endpoints: Endpoints };
+export function makeApiSpec<const Endpoints extends Record<string, ApiEndpoint>, const Metadata extends ApiMetadata>(
+  endpoints: Endpoints,
+  metadata: Metadata
+): { endpoints: Endpoints; metadata: Metadata };
+export function makeApiSpec<Endpoints extends Record<string, ApiEndpoint>, Metadata extends ApiMetadata>(
+  endpoints: Endpoints,
+  metadata?: ApiMetadata
+) {
+  return {
+    metadata,
+    endpoints,
+  };
 }
 
+/**
+ * Api spec builder
+ * simplifies the creation of an api spec
+ * with good type inference and intellisense
+ */
 export class ApiSpecBuilder<Metadata extends ApiMetadata | undefined, Endpoints extends ApiSpec["endpoints"] = {}> {
   private spec: ApiSpec = {
     endpoints: {},
@@ -15,8 +50,26 @@ export class ApiSpecBuilder<Metadata extends ApiMetadata | undefined, Endpoints 
     this.spec.metadata = metadata;
   }
 
+  /**
+   * add an endpoint to the spec by alias
+   * @param alias - the alias of the endpoint
+   * @param endpoint - the endpoint to add
+   * @returns - the updated builder
+   * @example
+   * ```ts
+   * const apiSpec = apiSpecBuilder()
+   *  .addEndpoint('getPosts', {
+   *   method: 'GET',
+   *   path: '/posts',
+   *   responses: {
+   *    200: z.array(postSchema),
+   *   },
+   * })
+   * .build();
+   * ```
+   */
   addEndpoint<Alias extends string, const Endpoint extends ApiEndpoint>(
-    name: Alias extends keyof Endpoints ? `Error: '${Alias}' is already defined` : Alias,
+    alias: Alias extends keyof Endpoints ? `Error: '${Alias}' is already defined` : Alias,
     endpoint: Endpoint
   ): ApiSpecBuilder<
     Metadata,
@@ -27,10 +80,14 @@ export class ApiSpecBuilder<Metadata extends ApiMetadata | undefined, Endpoints 
       }
     >
   > {
-    this.spec.endpoints[name] = endpoint;
+    this.spec.endpoints[alias] = endpoint;
     return this as any;
   }
 
+  /**
+   * build the api spec
+   * @returns - the api spec
+   */
   build(): Metadata extends undefined
     ? {
         endpoints: Endpoints;
