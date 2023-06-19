@@ -11,16 +11,19 @@ import {
   ApiGetEndpointQueries,
   ApiGetEndpointQuery,
   ApiGetEndpointResponse,
-} from "../src/endpoint-utilities.types";
+} from "../../packages/core/src/endpoint-utilities.types";
 import {
   ApiInferEndpointInputBody,
   ApiInferEndpointInputParam,
   ApiInferEndpointInputQuery,
-} from "../src/infer-utilities.types";
-import { makeApiSpec } from "../src/api-spec.builders";
-import { ApiZodSchema } from "../src/schema-type-zod";
-import { ApiTypeScriptSchema, tsSchema } from "../src/schema-type-ts";
-import { ApiEffectSchema } from "../src/schema-type-effect";
+} from "../../packages/core/src/infer-utilities.types";
+import { makeApiSpec } from "../../packages/core/src/api-spec.builders";
+import { ApiZodSchema } from "../../packages/core/src/schema-type-zod";
+import {
+  ApiTypeScriptSchema,
+  tsSchema,
+} from "../../packages/core/src/schema-type-ts";
+import { ApiEffectSchema } from "../../packages/effect/src/schema-type-effect";
 
 // example of a complete API specification
 export const apiSpec = makeApiSpec(

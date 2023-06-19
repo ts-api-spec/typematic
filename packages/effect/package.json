@@ -1,0 +1,19 @@
+{
+  "name": "@ts-api-spec/effect",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@effect/data": "0.12.6",
+    "@effect/schema": "0.20.1",
+    "@ts-api-spec/core": "workspace:*",
+    "typescript": "5.1.3"
+  }
+}

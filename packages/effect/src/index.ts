@@ -1,4 +1,4 @@
-import { SchemaType, ApiTypeProvider } from "./schema-type.types";
+import { SchemaType, ApiTypeProvider } from "@ts-api-spec/core";
 import { parseEither, type To, type From } from "@effect/schema/Schema";
 import * as E from "@effect/data/Either";
 

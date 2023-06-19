@@ -1,9 +1,12 @@
 import { z } from "zod";
 import * as S from "@effect/schema/Schema";
 import { pipe } from "@effect/data/Function";
-import { apiSpecBuilder } from "../src/api-spec.builders";
-import { ApiZodSchema } from "../src/schema-type-zod";
-import { ApiTypeScriptSchema, tsSchema } from "../src/schema-type-ts";
+import { apiSpecBuilder } from "../../packages/core/src/api-spec.builders";
+import { ApiZodSchema } from "../../packages/core/src/schema-type-zod";
+import {
+  ApiTypeScriptSchema,
+  tsSchema,
+} from "../../packages/core/src/schema-type-ts";
 import {
   ApiGetEndpoint,
   ApiGetEndpointBody,
@@ -13,13 +16,13 @@ import {
   ApiGetEndpointQueries,
   ApiGetEndpointQuery,
   ApiGetEndpointResponse,
-} from "../src/endpoint-utilities.types";
-import { ApiEffectSchema } from "../src/schema-type-effect";
+} from "../../packages/core/src/endpoint-utilities.types";
+import { ApiEffectSchema } from "../../packages/effect/src/schema-type-effect";
 import {
   ApiInferEndpointInputBody,
   ApiInferEndpointInputParam,
   ApiInferEndpointInputQuery,
-} from "../src/infer-utilities.types";
+} from "../../packages/core/src/infer-utilities.types";
 
 const apiSpec = apiSpecBuilder({
   name: "my-api",
