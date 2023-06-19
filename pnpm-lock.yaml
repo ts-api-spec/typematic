@@ -29,7 +29,7 @@ importers:
       '@effect/schema':
         specifier: 0.20.1
         version: 0.20.1
-      '@ts-api-spec/core':
+      '@typematic/core':
         specifier: workspace:*
         version: link:../core
       typescript:

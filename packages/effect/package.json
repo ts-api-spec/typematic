@@ -1,5 +1,5 @@
 {
-  "name": "@ts-api-spec/effect",
+  "name": "@typematic/effect",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,7 +13,7 @@
   "devDependencies": {
     "@effect/data": "0.12.6",
     "@effect/schema": "0.20.1",
-    "@ts-api-spec/core": "workspace:*",
+    "@typematic/core": "workspace:*",
     "typescript": "5.1.3"
   }
 }

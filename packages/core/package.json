@@ -1,5 +1,5 @@
 {
-  "name": "@ts-api-spec/core",
+  "name": "@typematic/core",
   "version": "1.0.0",
   "description": "",
   "main": "lib/index.js",
