@@ -11,7 +11,6 @@ export interface EffectTypeProvider
   input: From<this["schema"]>;
   output: To<this["schema"]>;
 }
-console.log("");
 export const ApiEffectSchema: SchemaType<EffectTypeProvider> = {
   validate: (schema, input) => {
     const result = parseEither(schema)(input);
