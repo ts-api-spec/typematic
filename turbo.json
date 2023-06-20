@@ -9,8 +9,9 @@
         "lib/**"
       ]
     },
-    "test": {
-      "outputs": []
+    "test": {},
+    "test:watch": {
+      "cache": false
     },
     "lint": {},
     "deploy": {}

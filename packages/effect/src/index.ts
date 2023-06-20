@@ -1,5 +1,6 @@
 import { SchemaType, ApiTypeProvider } from "@typematic/core";
 import { parseEither, type To, type From } from "@effect/schema/Schema";
+import { formatErrors } from "@effect/schema/TreeFormatter";
 import * as E from "@effect/data/Either";
 
 export interface EffectTypeProvider
@@ -17,7 +18,7 @@ export const ApiEffectSchema: SchemaType<EffectTypeProvider> = {
     if (E.isRight(result)) {
       return { success: true, data: result.right };
     } else {
-      return { success: false, error: result.left };
+      return { success: false, error: new Error(formatErrors(result.left.errors)) };
     }
   },
   validateAsync: async (schema, input) => {
