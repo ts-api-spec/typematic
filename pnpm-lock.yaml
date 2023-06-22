@@ -15,6 +15,27 @@ importers:
         specifier: ^1.10.3
         version: 1.10.3
 
+  packages/arktype:
+    devDependencies:
+      '@typematic/core':
+        specifier: workspace:*
+        version: link:../core
+      '@types/node':
+        specifier: 20.3.1
+        version: 20.3.1
+      '@vitest/coverage-v8':
+        specifier: 0.32.2
+        version: 0.32.2(vitest@0.32.2)
+      arktype:
+        specifier: 1.0.14-alpha
+        version: 1.0.14-alpha
+      typescript:
+        specifier: 5.1.3
+        version: 5.1.3
+      vitest:
+        specifier: 0.32.2
+        version: 0.32.2
+
   packages/core:
     devDependencies:
       typescript:
@@ -36,7 +57,7 @@ importers:
         specifier: 20.3.1
         version: 20.3.1
       '@vitest/coverage-v8':
-        specifier: ^0.32.2
+        specifier: 0.32.2
         version: 0.32.2(vitest@0.32.2)
       typescript:
         specifier: 5.1.3
@@ -711,6 +732,11 @@ packages:
     dependencies:
       sprintf-js: 1.0.3
     dev: false
+
+  /arktype@1.0.14-alpha:
+    resolution: {integrity: sha512-theD5K4QrYCWMtQ52Masj169IgtMJ8Argld/MBS4lotEwR3b+GzfBvsqVJ1OIKhJDTdES02FLQTjcfRe00//mA==}
+    requiresBuild: true
+    dev: true
 
   /array-buffer-byte-length@1.0.0:
     resolution: {integrity: sha512-LPuwb2P+NrQw3XhxGc36+XSvuBPopovXYTR9Ew++Du9Yb/bx5AzBfrIsBoj0EZUifjQU+sHL21sseZ3jerWO/A==}
