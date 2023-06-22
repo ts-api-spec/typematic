@@ -1,4 +1,4 @@
-# Typematic - Effect
+# Typematic - Arktype
 
-Effect plugin for Typematic
-Allows to use `@effect/schema` as a validation library for Typematic
+Arktype plugin for Typematic
+Allows to use `Arktype` as a validation library for Typematic
