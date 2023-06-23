@@ -1,4 +1,4 @@
-# Typematic - Arktype
+# Typematic - TypeBox
 
-Arktype plugin for Typematic
-Allows to use `Arktype` as a validation library for Typematic
+TypeBox plugin for Typematic
+Allows to use `TypeBox` as a validation library for Typematic

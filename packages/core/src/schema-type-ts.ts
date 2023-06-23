@@ -1,7 +1,7 @@
 import { SchemaValidationResult, ApiTypeProvider, SchemaType } from "./schema-type.types";
 
 const genericTsSchema = {
-  parse: (data: unknown): SchemaValidationResult => ({
+  parse: (data: unknown): SchemaValidationResult<any> => ({
     success: true,
     data,
   }),
@@ -9,7 +9,7 @@ const genericTsSchema = {
 
 type TsSchema<Schema> = {
   readonly _schema: Schema;
-  parse: (input: unknown) => SchemaValidationResult;
+  parse: (input: unknown) => SchemaValidationResult<Schema>;
 };
 
 /**
@@ -25,7 +25,7 @@ export const tsSchema = <Schema>(): TsSchema<Schema> => genericTsSchema as any;
  */
 export const tsFnSchema = <Schema>(throwingValidator: (data: unknown) => Schema): TsSchema<Schema> => ({
   _schema: undefined as Schema,
-  parse: (data: unknown): SchemaValidationResult => {
+  parse: (data: unknown): SchemaValidationResult<Schema> => {
     try {
       return {
         success: true,
@@ -43,6 +43,8 @@ export const tsFnSchema = <Schema>(throwingValidator: (data: unknown) => Schema)
 export interface TsTypeProvider extends ApiTypeProvider<{ _schema: unknown }> {
   input: this["schema"]["_schema"];
   output: this["schema"]["_schema"];
+  error: never;
+  base: TsSchema<any>;
 }
 
 /**
@@ -50,6 +52,6 @@ export interface TsTypeProvider extends ApiTypeProvider<{ _schema: unknown }> {
  * to use with the `tsSchema` and `tsFnSchema` functions
  */
 export const ApiTypeScriptSchema: SchemaType<TsTypeProvider> = {
-  validate: (schema, input) => schema.parse(input),
-  validateAsync: (schema, input) => schema.parse(input),
+  validate: (schema, input) => schema.parse(input) as any,
+  validateAsync: (schema, input) => schema.parse(input) as any,
 };
