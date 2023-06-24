@@ -7,23 +7,9 @@ Allows to use `io-ts` as a validation library for Typematic
 
 ```typescript
 import { apiSpecBuilder } from "@typematic/core";
-import type {
-  ApiGetEndpoint,
-  ApiGetEndpointBody,
-  ApiGetEndpointCookies,
-  ApiGetEndpointHeaders,
-  ApiGetEndpointParams,
-  ApiGetEndpointQueries,
-  ApiGetEndpointQuery,
-  ApiGetEndpointResponse,
-  ApiInferEndpointInputBody,
-  ApiInferEndpointInputParam,
-  ApiInferEndpointInputQuery,
-  ApiInferEndpointOutputResponse,
-} from "@typematic/core";
+import { ApiIoTsSchema } from "@typematic/io-ts";
 import * as t from "io-ts";
 
-import { ApiIoTsSchema } from "@typematic/io-ts";
 
 function customType<A>(name: string, is: (u: unknown) => u is A): t.Type<A, A, unknown> {
   return new t.Type(name, is, (u, c) => (is(u) ? t.success(u) : t.failure(u, c)), t.identity);
