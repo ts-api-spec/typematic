@@ -18,6 +18,14 @@ import type { InferInputTypeFromSchema, InferOutputTypeFromSchema, SchemaType } 
 import { ApiTypeScriptSchema } from "./schema-type-ts";
 
 /**
+ * Generic schema type
+ * used to detect if a schema intersects with ApiParameter type
+ * because some libraries like superstruct use an internal schema property
+ * that clashes with the ApiParameter type
+ */
+type GenericSchema = { validate: (...arg: any) => any };
+
+/**
  * Get the schema type for the api spec by looking at the metadata
  * Allows to define a default schema type for the api spec if none is defined
  * @param Api - Api spec
@@ -196,7 +204,9 @@ export type ApiInferEndpointInputBody<
   $SchemaType extends SchemaType = ApiGetEndpointBodySchemaType<Api, Endpoint, DefaultSchemaType>,
   $Body = ApiGetEndpointBody<Api, Endpoint>
 > = $Body extends ApiDataParameter
-  ? InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body["schema"]>
+  ? $Body extends GenericSchema
+    ? InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>
+    : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body["schema"]>
   : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>;
 
 /**
@@ -222,7 +232,9 @@ export type ApiInferEndpointInputBodyByPath<
   $SchemaType extends SchemaType = ApiGetEndpointBodySchemaTypeByPath<Api, Method, Path, DefaultSchemaType>,
   $Body = ApiGetEndpointBodyByPath<Api, Method, Path>
 > = $Body extends ApiDataParameter
-  ? InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body["schema"]>
+  ? $Body extends GenericSchema
+    ? InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>
+    : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body["schema"]>
   : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>;
 
 /**
@@ -246,7 +258,9 @@ export type ApiInferEndpointOutputBody<
   $SchemaType extends SchemaType = ApiGetEndpointBodySchemaType<Api, Endpoint, DefaultSchemaType>,
   $Body = ApiGetEndpointBody<Api, Endpoint>
 > = $Body extends ApiDataParameter
-  ? InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body["schema"]>
+  ? $Body extends GenericSchema
+    ? InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>
+    : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body["schema"]>
   : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>;
 
 /**
@@ -272,7 +286,9 @@ export type ApiInferEndpointOutputBodyByPath<
   $SchemaType extends SchemaType = ApiGetEndpointBodySchemaTypeByPath<Api, Method, Path, DefaultSchemaType>,
   $Body = ApiGetEndpointBodyByPath<Api, Method, Path>
 > = $Body extends ApiDataParameter
-  ? InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body["schema"]>
+  ? $Body extends GenericSchema
+    ? InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>
+    : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body["schema"]>
   : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>;
 
 /**
@@ -300,7 +316,9 @@ export type ApiInferEndpointInputEntry<
   $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaType<Api, Endpoint, Entry, EntryParam, DefaultSchemaType>,
   $EntryParam = ApiGetEndpoint<Api, Endpoint>[Entry][EntryParam]
 > = $EntryParam extends ApiParameter
-  ? InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam["schema"]>
+  ? $EntryParam extends GenericSchema
+    ? InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>
+    : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam["schema"]>
   : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>;
 
 /**
@@ -337,7 +355,9 @@ export type ApiInferEndpointInputEntryByPath<
   >,
   $EntryParam = ApiGetEndpointByPath<Api, Method, Path>[Entry][EntryParam]
 > = $EntryParam extends ApiParameter
-  ? InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam["schema"]>
+  ? $EntryParam extends GenericSchema
+    ? InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>
+    : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam["schema"]>
   : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>;
 
 /**
@@ -365,7 +385,9 @@ export type ApiInferEndpointOutputEntry<
   $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaType<Api, Endpoint, Entry, EntryParam, DefaultSchemaType>,
   $EntryParam = ApiGetEndpoint<Api, Endpoint>[Entry][EntryParam]
 > = $EntryParam extends ApiParameter
-  ? InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam["schema"]>
+  ? $EntryParam extends GenericSchema
+    ? InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>
+    : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam["schema"]>
   : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>;
 
 /**
@@ -402,7 +424,9 @@ export type ApiInferEndpointOutputEntryByPath<
   >,
   $EntryParam = ApiGetEndpointByPath<Api, Method, Path>[Entry][EntryParam]
 > = $EntryParam extends ApiParameter
-  ? InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam["schema"]>
+  ? $EntryParam extends GenericSchema
+    ? InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>
+    : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam["schema"]>
   : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>;
 
 /**

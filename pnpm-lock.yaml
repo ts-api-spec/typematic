@@ -111,6 +111,27 @@ importers:
         specifier: 0.32.2
         version: 0.32.2
 
+  packages/superstruct:
+    devDependencies:
+      '@typematic/core':
+        specifier: workspace:*
+        version: link:../core
+      '@types/node':
+        specifier: 20.3.1
+        version: 20.3.1
+      '@vitest/coverage-v8':
+        specifier: 0.32.2
+        version: 0.32.2(vitest@0.32.2)
+      superstruct:
+        specifier: 1.0.3
+        version: 1.0.3
+      typescript:
+        specifier: 5.1.3
+        version: 5.1.3
+      vitest:
+        specifier: 0.32.2
+        version: 0.32.2
+
   packages/typebox:
     devDependencies:
       '@sinclair/typebox':
@@ -2522,6 +2543,11 @@ packages:
     resolution: {integrity: sha512-QZTsipNpa2Ppr6v1AmJHESqJ3Uz247MUS0OjrnnZjFAvEoWqxuyFuXn2xLgMtRnijJShAa1HL0gtJyUs7u7n3Q==}
     dependencies:
       acorn: 8.9.0
+    dev: true
+
+  /superstruct@1.0.3:
+    resolution: {integrity: sha512-8iTn3oSS8nRGn+C2pgXSKPI3jmpm6FExNazNpjvqS6ZUJQCej3PUXEKM8NjHBOs54ExM+LPW/FBRhymrdcCiSg==}
+    engines: {node: '>=14.0.0'}
     dev: true
 
   /supports-color@5.5.0:
