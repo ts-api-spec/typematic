@@ -53,7 +53,9 @@ export interface ApiEndpoint {
    * Headers for the endpoint
    * a record of schemas or a record of api parameters
    */
-  readonly headers?: Record<string, ApiParameter | {}>;
+  readonly headers?: {
+    readonly [key in ApiHeaders]?: ApiParameter | {};
+  };
   /**
    * Cookies for the endpoint
    * a record of schemas or a record of api parameters
@@ -174,6 +176,51 @@ export type ApiMediaType =
   | "image/webp"
   | "image/svg+xml"
   | (string & {});
+
+export type ApiHeaders =
+  | "accept"
+  | "accept-encoding"
+  | "accept-language"
+  | "age"
+  | "authorization"
+  | "cache-control"
+  | "content-disposition"
+  | "content-encoding"
+  | "content-language"
+  | "content-length"
+  | "content-location"
+  | "content-type"
+  | "cookie"
+  | "date"
+  | "etag"
+  | "expect"
+  | "expires"
+  | "forwarded"
+  | "from"
+  | "host"
+  | "if-match"
+  | "if-modified-since"
+  | "if-none-match"
+  | "if-unmodified-since"
+  | "keep-alive"
+  | "last-modified"
+  | "link"
+  | "location"
+  | "max-forwards"
+  | "pragma"
+  | "proxy-authenticate"
+  | "proxy-authorization"
+  | "range"
+  | "referer"
+  | "retry-after"
+  | "set-cookie"
+  | "strict-transport-security"
+  | "transfer-encoding"
+  | "user-agent"
+  | "vary"
+  | "via"
+  | "warning"
+  | "www-authenticate";
 
 /**
  * Data format for the request or response body
