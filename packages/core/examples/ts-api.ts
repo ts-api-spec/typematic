@@ -57,7 +57,13 @@ const apiSpec = apiSpecBuilder({
     },
     headers: {
       authorization: tsSchema<`Bearer ${string}`>(), // common headers are proposed in auto-completion
-      "x-custom": tsSchema<string>(), // custom headers are allowed
+      "x-custom": {
+        // custom headers are allowed
+        metadata: {
+          description: "Custom header",
+        },
+        schema: tsSchema<string>(),
+      },
     },
     responses: {
       /**

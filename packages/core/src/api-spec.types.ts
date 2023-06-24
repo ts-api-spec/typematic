@@ -220,7 +220,8 @@ export type ApiHeaders =
   | "vary"
   | "via"
   | "warning"
-  | "www-authenticate";
+  | "www-authenticate"
+  | (string & {});
 
 /**
  * Data format for the request or response body
