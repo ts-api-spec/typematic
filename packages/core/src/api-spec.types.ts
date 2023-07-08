@@ -7,6 +7,7 @@ export interface ApiSpec {
   readonly metadata?: ApiMetadata;
   readonly endpoints: Record<string, ApiEndpoint>;
   readonly security?: ApiSecurity;
+  readonly schemas?: Record<string, unknown>;
 }
 
 /**
