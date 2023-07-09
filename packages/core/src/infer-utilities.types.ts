@@ -8,12 +8,14 @@ import type {
   ApiSpec,
 } from "./api-spec.types";
 import type {
-  GenericSchema,
+  ApiGetSchemaOf,
+  ApiGetPathsByMethod,
   ApiGetEndpoint,
+  ApiGetEndpointByPath,
   ApiGetEndpointBody,
   ApiGetEndpointBodyByPath,
-  ApiGetEndpointByPath,
-  ApiGetPathsByMethod,
+  ApiGetEndpointBodySchema,
+  ApiGetEndpointBodySchemaByPath,
 } from "./endpoint-utilities.types";
 import type { InferInputTypeFromSchema, InferOutputTypeFromSchema, SchemaType } from "./schema-type.types";
 import { ApiTypeScriptSchema } from "./schema-type-ts";
@@ -195,12 +197,8 @@ export type ApiInferEndpointInputBody<
   Endpoint extends keyof Api["endpoints"],
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
   $SchemaType extends SchemaType = ApiGetEndpointBodySchemaType<Api, Endpoint, DefaultSchemaType>,
-  $Body = ApiGetEndpointBody<Api, Endpoint>
-> = $Body extends ApiRequestBodyParameter
-  ? $Body extends GenericSchema
-    ? InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>
-    : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body["schema"]>
-  : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>;
+  $Schema = ApiGetEndpointBodySchema<Api, Endpoint>
+> = InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Schema>;
 
 /**
  * Infer the typescript input type for an endpoint body
@@ -223,12 +221,8 @@ export type ApiInferEndpointInputBodyByPath<
   Path extends ApiGetPathsByMethod<Api, Method>,
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
   $SchemaType extends SchemaType = ApiGetEndpointBodySchemaTypeByPath<Api, Method, Path, DefaultSchemaType>,
-  $Body = ApiGetEndpointBodyByPath<Api, Method, Path>
-> = $Body extends ApiRequestBodyParameter
-  ? $Body extends GenericSchema
-    ? InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>
-    : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body["schema"]>
-  : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>;
+  $Schema = ApiGetEndpointBodySchemaByPath<Api, Method, Path>
+> = InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Schema>;
 
 /**
  * Infer the typescript output type for an endpoint body
@@ -249,12 +243,8 @@ export type ApiInferEndpointOutputBody<
   Endpoint extends keyof Api["endpoints"],
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
   $SchemaType extends SchemaType = ApiGetEndpointBodySchemaType<Api, Endpoint, DefaultSchemaType>,
-  $Body = ApiGetEndpointBody<Api, Endpoint>
-> = $Body extends ApiRequestBodyParameter
-  ? $Body extends GenericSchema
-    ? InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>
-    : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body["schema"]>
-  : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>;
+  $Schema = ApiGetEndpointBodySchema<Api, Endpoint>
+> = InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Schema>;
 
 /**
  * Infer the typescript output type for an endpoint body
@@ -277,12 +267,8 @@ export type ApiInferEndpointOutputBodyByPath<
   Path extends ApiGetPathsByMethod<Api, Method>,
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
   $SchemaType extends SchemaType = ApiGetEndpointBodySchemaTypeByPath<Api, Method, Path, DefaultSchemaType>,
-  $Body = ApiGetEndpointBodyByPath<Api, Method, Path>
-> = $Body extends ApiRequestBodyParameter
-  ? $Body extends GenericSchema
-    ? InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>
-    : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body["schema"]>
-  : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Body>;
+  $Schema = ApiGetEndpointBodySchemaByPath<Api, Method, Path>
+> = InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Schema>;
 
 /**
  * Infer the typescript input type for an endpoint entry (path, query, header, cookie, response)
@@ -308,11 +294,7 @@ export type ApiInferEndpointInputEntry<
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
   $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaType<Api, Endpoint, Entry, EntryParam, DefaultSchemaType>,
   $EntryParam = ApiGetEndpoint<Api, Endpoint>[Entry][EntryParam]
-> = $EntryParam extends ApiParameter
-  ? $EntryParam extends GenericSchema
-    ? InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>
-    : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam["schema"]>
-  : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>;
+> = InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, ApiGetSchemaOf<$EntryParam>>;
 
 /**
  * Infer the typescript input type for an endpoint entry (path, query, header, cookie, response)
@@ -347,11 +329,7 @@ export type ApiInferEndpointInputEntryByPath<
     DefaultSchemaType
   >,
   $EntryParam = ApiGetEndpointByPath<Api, Method, Path>[Entry][EntryParam]
-> = $EntryParam extends ApiParameter
-  ? $EntryParam extends GenericSchema
-    ? InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>
-    : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam["schema"]>
-  : InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>;
+> = InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, ApiGetSchemaOf<$EntryParam>>;
 
 /**
  * Infer the typescript output type for an endpoint entry (path, query, header, cookie, response)
@@ -377,11 +355,7 @@ export type ApiInferEndpointOutputEntry<
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
   $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaType<Api, Endpoint, Entry, EntryParam, DefaultSchemaType>,
   $EntryParam = ApiGetEndpoint<Api, Endpoint>[Entry][EntryParam]
-> = $EntryParam extends ApiParameter
-  ? $EntryParam extends GenericSchema
-    ? InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>
-    : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam["schema"]>
-  : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>;
+> = InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, ApiGetSchemaOf<$EntryParam>>;
 
 /**
  * Infer the typescript output type for an endpoint entry (path, query, header, cookie, response)
@@ -416,11 +390,7 @@ export type ApiInferEndpointOutputEntryByPath<
     DefaultSchemaType
   >,
   $EntryParam = ApiGetEndpointByPath<Api, Method, Path>[Entry][EntryParam]
-> = $EntryParam extends ApiParameter
-  ? $EntryParam extends GenericSchema
-    ? InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>
-    : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam["schema"]>
-  : InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $EntryParam>;
+> = InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, ApiGetSchemaOf<$EntryParam>>;
 
 /**
  * Infer the typescript input type for an endpoint path parameter

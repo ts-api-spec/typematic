@@ -9,6 +9,11 @@ import type { Split, SplitMany } from "./utils.types";
  */
 export type GenericSchema = { validate: (...arg: any) => any };
 
+/**
+ * Get the schema of any request entry or response entry
+ * @param T - Request entry or response entry
+ * @returns Schema of the request entry or response entry
+ */
 export type ApiGetSchemaOf<T> = T extends ApiParameter ? (T extends GenericSchema ? T : T["schema"]) : T;
 
 export type ApiGetPathsByMethod<Api extends ApiSpec, Method extends ApiMethod> = {
