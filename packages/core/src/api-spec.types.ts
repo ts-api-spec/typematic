@@ -144,19 +144,57 @@ export interface ApiResponseBodyParameter {
 }
 
 /**
+ * API metadata activation options
+ */
+interface ApiActivationOptions {
+  /**
+   * enable or disable the option for incoming requests
+   * This is used for server side handling of the API
+   */
+  incomingRequest?: boolean;
+  /**
+   * enable or disable the option for outgoing requests
+   * This is used for client side handling of the API
+   */
+  outgoingRequest?: boolean;
+  /**
+   * enable or disable the option for incoming responses
+   * This is used for client side handling of the API
+   */
+  incomingResponse?: boolean;
+  /**
+   * enable or disable the option for outgoing responses
+   * This is used for server side handling of the API
+   */
+  outgoingResponse?: boolean;
+}
+
+/**
  * common metadatas
  */
 export interface ApiBaseMetadata {
   /**
-   * optional description for the associated element
+   * optional description for the associated element, used for documentation
    */
   readonly description?: string;
   /**
    * optionally override the default schema type for the associated element
    * This allows to use a custom schema type for the associated element
-   * Implementations of API spec can make one or more schema handled byt default
+   * Implementations of API spec can make one or more schema handled by default
    */
   readonly schemaType?: SchemaType;
+  /**
+   * optionally disable or enable validation for the associated element
+   * default is implementation specific, customize if needed
+   * implementors of API spec are encouraged to honor the validate option
+   */
+  readonly validate?: boolean | ApiActivationOptions;
+  /**
+   * optionally disable or enable transformation for the associated element
+   * default is implementation specific, customize if needed
+   * implementors of API spec are encouraged to honor the transform option
+   */
+  readonly transform?: boolean | ApiActivationOptions;
 }
 
 /**

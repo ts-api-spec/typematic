@@ -16,6 +16,12 @@ export type GenericSchema = { validate: (...arg: any) => any };
  */
 export type ApiGetSchemaOf<T> = T extends ApiParameter ? (T extends GenericSchema ? T : T["schema"]) : T;
 
+/**
+ * List of all possible API Paths for an HTTP Method
+ * @param Api - Api Spec
+ * @param Method - HTTP Method
+ * @returns List of all possible API Paths for the HTTP Method
+ */
 export type ApiGetPathsByMethod<Api extends ApiSpec, Method extends ApiMethod> = {
   [Endpoint in keyof Api["endpoints"]]: ApiGetEndpoint<Api, Endpoint>["method"] extends
     | Lowercase<Method>
@@ -24,7 +30,7 @@ export type ApiGetPathsByMethod<Api extends ApiSpec, Method extends ApiMethod> =
     : never;
 }[keyof Api["endpoints"]];
 
-type PathSeparator = ["/", "?", "&", "#", "=", "(", ")", "[", "]", "{", "}", "<", ">", "%"];
+type PathSeparator = ["/", "?", "&", "#", "=", "(", ")", "[", "]", "<", ">", "%", "@"];
 
 type FilterParams<Params, Acc extends string[] = []> = Params extends [infer First, ...infer Rest]
   ? First extends `:${infer Param}`
@@ -40,7 +46,7 @@ type FilterParams<Params, Acc extends string[] = []> = Params extends [infer Fir
  * ```ts
  * type Path = "/users/:id/posts/:postId"
  * type PathParams = ApiPathToParams<Path>
- * // ["id", "postId"]
+ * // output: ["id", "postId"]
  * ```
  */
 export type ApiPathToParams<Path extends string> = FilterParams<SplitMany<Path, PathSeparator>>;
