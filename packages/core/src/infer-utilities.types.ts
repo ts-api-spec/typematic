@@ -8,6 +8,7 @@ import type {
   ApiSpec,
 } from "./api-spec.types";
 import type {
+  GenericSchema,
   ApiGetEndpoint,
   ApiGetEndpointBody,
   ApiGetEndpointBodyByPath,
@@ -16,14 +17,6 @@ import type {
 } from "./endpoint-utilities.types";
 import type { InferInputTypeFromSchema, InferOutputTypeFromSchema, SchemaType } from "./schema-type.types";
 import { ApiTypeScriptSchema } from "./schema-type-ts";
-
-/**
- * Generic schema type
- * used to detect if a schema intersects with ApiParameter type
- * because some libraries like superstruct use an internal schema property
- * that clashes with the ApiParameter type
- */
-type GenericSchema = { validate: (...arg: any) => any };
 
 /**
  * Get the schema type for the api spec by looking at the metadata

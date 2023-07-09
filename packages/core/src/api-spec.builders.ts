@@ -1,5 +1,5 @@
-import { ApiEndpoint, ApiMetadata, ApiSpec } from "./api-spec.types";
-import { Merge } from "./utils.types";
+import type { ApiEndpoint, ApiMetadata, ApiSpec } from "./api-spec.types";
+import type { Merge } from "./utils.types";
 
 /**
  * create an api spec

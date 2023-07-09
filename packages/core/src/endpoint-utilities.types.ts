@@ -1,4 +1,15 @@
-import type { ApiSpec, ApiMethod, ApiDataParameter, ApiParameter } from "./api-spec.types";
+import type { ApiSpec, ApiMethod, ApiParameter } from "./api-spec.types";
+import type { Split, SplitMany } from "./utils.types";
+
+/**
+ * Generic schema type
+ * used to detect if a schema intersects with ApiParameter type
+ * because some libraries like superstruct use an internal schema property
+ * that clashes with the ApiParameter type
+ */
+export type GenericSchema = { validate: (...arg: any) => any };
+
+export type ApiGetSchemaOf<T> = T extends ApiParameter ? (T extends GenericSchema ? T : T["schema"]) : T;
 
 export type ApiGetPathsByMethod<Api extends ApiSpec, Method extends ApiMethod> = {
   [Endpoint in keyof Api["endpoints"]]: ApiGetEndpoint<Api, Endpoint>["method"] extends
@@ -7,6 +18,27 @@ export type ApiGetPathsByMethod<Api extends ApiSpec, Method extends ApiMethod> =
     ? ApiGetEndpoint<Api, Endpoint>["path"]
     : never;
 }[keyof Api["endpoints"]];
+
+type PathSeparator = ["/", "?", "&", "#", "=", "(", ")", "[", "]", "{", "}", "<", ">", "%"];
+
+type FilterParams<Params, Acc extends string[] = []> = Params extends [infer First, ...infer Rest]
+  ? First extends `:${infer Param}`
+    ? FilterParams<Rest, [...Acc, ...Split<Param, ":">]>
+    : FilterParams<Rest, Acc>
+  : Acc;
+
+/**
+ * Extract Path Params from a path
+ * @param Path - Path to extract params from
+ * @returns Path params
+ * @example
+ * ```ts
+ * type Path = "/users/:id/posts/:postId"
+ * type PathParams = ApiPathToParams<Path>
+ * // ["id", "postId"]
+ * ```
+ */
+export type ApiPathToParams<Path extends string> = FilterParams<SplitMany<Path, PathSeparator>>;
 
 /**
  * Get an endpoint type from an api spec using the endpoint name
@@ -97,10 +129,9 @@ export type ApiGetEndpointParamByPath<
 export type ApiGetEndpointParamSchema<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  Param extends keyof ApiGetEndpoint<Api, Endpoint>["params"]
-> = ApiGetEndpointParam<Api, Endpoint, Param> extends ApiParameter
-  ? ApiGetEndpointParam<Api, Endpoint, Param>["schema"]
-  : never;
+  Param extends keyof ApiGetEndpoint<Api, Endpoint>["params"],
+  $Param = ApiGetEndpointParam<Api, Endpoint, Param>
+> = ApiGetSchemaOf<$Param>;
 
 /**
  * Get an endpoint path parameter schema from an api spec using the endpoint path and parameter name
@@ -114,10 +145,9 @@ export type ApiGetEndpointParamSchemaByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  Param extends keyof ApiGetEndpointParamsByPath<Api, Method, Path>
-> = ApiGetEndpointParamByPath<Api, Method, Path, Param> extends ApiParameter
-  ? ApiGetEndpointParamByPath<Api, Method, Path, Param>["schema"]
-  : never;
+  Param extends keyof ApiGetEndpointParamsByPath<Api, Method, Path>,
+  $Param = ApiGetEndpointParamByPath<Api, Method, Path, Param>
+> = ApiGetSchemaOf<$Param>;
 
 /**
  * Get all the endpoint query parameters from an api spec using the endpoint name
@@ -181,10 +211,9 @@ export type ApiGetEndpointQueryByPath<
 export type ApiGetEndpointQuerySchema<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  Query extends keyof ApiGetEndpoint<Api, Endpoint>["query"]
-> = ApiGetEndpointQuery<Api, Endpoint, Query> extends ApiParameter
-  ? ApiGetEndpointQuery<Api, Endpoint, Query>["schema"]
-  : never;
+  Query extends keyof ApiGetEndpoint<Api, Endpoint>["query"],
+  $Query = ApiGetEndpointQuery<Api, Endpoint, Query>
+> = ApiGetSchemaOf<$Query>;
 
 /**
  * Get an endpoint query parameter schema from an api spec using the endpoint path and query parameter name
@@ -198,10 +227,9 @@ export type ApiGetEndpointQuerySchemaByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  Query extends keyof ApiGetEndpointQueriesByPath<Api, Method, Path>
-> = ApiGetEndpointQueryByPath<Api, Method, Path, Query> extends ApiParameter
-  ? ApiGetEndpointQueryByPath<Api, Method, Path, Query>["schema"]
-  : never;
+  Query extends keyof ApiGetEndpointQueriesByPath<Api, Method, Path>,
+  $Query = ApiGetEndpointQueryByPath<Api, Method, Path, Query>
+> = ApiGetSchemaOf<$Query>;
 
 /**
  * Get all the endpoint headers from an api spec using the endpoint name
@@ -265,10 +293,9 @@ export type ApiGetEndpointHeaderByPath<
 export type ApiGetEndpointHeaderSchema<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  Header extends keyof ApiGetEndpoint<Api, Endpoint>["headers"]
-> = ApiGetEndpointHeader<Api, Endpoint, Header> extends ApiParameter
-  ? ApiGetEndpointHeader<Api, Endpoint, Header>["schema"]
-  : never;
+  Header extends keyof ApiGetEndpoint<Api, Endpoint>["headers"],
+  $Header = ApiGetEndpointHeader<Api, Endpoint, Header>
+> = ApiGetSchemaOf<$Header>;
 
 /**
  * Get an endpoint header schema from an api spec using the endpoint path and header name
@@ -282,10 +309,9 @@ export type ApiGetEndpointHeaderSchemaByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  Header extends keyof ApiGetEndpointHeadersByPath<Api, Method, Path>
-> = ApiGetEndpointHeaderByPath<Api, Method, Path, Header> extends ApiParameter
-  ? ApiGetEndpointHeaderByPath<Api, Method, Path, Header>["schema"]
-  : never;
+  Header extends keyof ApiGetEndpointHeadersByPath<Api, Method, Path>,
+  $Header = ApiGetEndpointHeaderByPath<Api, Method, Path, Header>
+> = ApiGetSchemaOf<$Header>;
 
 /**
  * Get all the endpoint cookies from an api spec using the endpoint name
@@ -349,10 +375,25 @@ export type ApiGetEndpointCookieByPath<
 export type ApiGetEndpointCookieSchema<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  Cookie extends keyof ApiGetEndpoint<Api, Endpoint>["cookies"]
-> = ApiGetEndpointCookie<Api, Endpoint, Cookie> extends ApiParameter
-  ? ApiGetEndpointCookie<Api, Endpoint, Cookie>["schema"]
-  : never;
+  Cookie extends keyof ApiGetEndpoint<Api, Endpoint>["cookies"],
+  $Cookie = ApiGetEndpointCookie<Api, Endpoint, Cookie>
+> = ApiGetSchemaOf<$Cookie>;
+
+/**
+ * Get an endpoint cookie schema from an api spec using the endpoint path and cookie name
+ * @param Api - Api specification
+ * @param Method - HTTP method
+ * @param Path - Endpoint path
+ * @param Cookie - Cookie name
+ * @returns Endpoint cookie schema
+ */
+export type ApiGetEndpointCookieSchemaByPath<
+  Api extends ApiSpec,
+  Method extends ApiMethod,
+  Path extends ApiGetPathsByMethod<Api, Method>,
+  Cookie extends keyof ApiGetEndpointCookiesByPath<Api, Method, Path>,
+  $Cookie = ApiGetEndpointCookieByPath<Api, Method, Path, Cookie>
+> = ApiGetSchemaOf<$Cookie>;
 
 /**
  * Get all the endpoint responses from an api spec using the endpoint name
@@ -416,10 +457,9 @@ export type ApiGetEndpointResponseByPath<
 export type ApiGetEndpointResponseSchema<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  StatusCode extends keyof ApiGetEndpoint<Api, Endpoint>["responses"]
-> = ApiGetEndpointResponse<Api, Endpoint, StatusCode> extends ApiDataParameter
-  ? ApiGetEndpointResponse<Api, Endpoint, StatusCode>["schema"]
-  : never;
+  StatusCode extends keyof ApiGetEndpoint<Api, Endpoint>["responses"],
+  $Response = ApiGetEndpointResponse<Api, Endpoint, StatusCode>
+> = ApiGetSchemaOf<$Response>;
 
 /**
  * Get an endpoint response schema from an api spec using the endpoint path and response status code
@@ -433,10 +473,9 @@ export type ApiGetEndpointResponseSchemaByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  StatusCode extends keyof ApiGetEndpointResponsesByPath<Api, Method, Path>
-> = ApiGetEndpointResponseByPath<Api, Method, Path, StatusCode> extends ApiDataParameter
-  ? ApiGetEndpointResponseByPath<Api, Method, Path, StatusCode>["schema"]
-  : never;
+  StatusCode extends keyof ApiGetEndpointResponsesByPath<Api, Method, Path>,
+  $Response = ApiGetEndpointResponseByPath<Api, Method, Path, StatusCode>
+> = ApiGetSchemaOf<$Response>;
 
 /**
  * Get the endpoint body from an api spec using the endpoint name
@@ -468,12 +507,11 @@ export type ApiGetEndpointBodyByPath<
  * @param Endpoint - Endpoint name
  * @returns Endpoint body schema
  */
-export type ApiGetEndpointBodySchema<Api extends ApiSpec, Endpoint extends keyof Api["endpoints"]> = ApiGetEndpointBody<
-  Api,
-  Endpoint
-> extends ApiDataParameter
-  ? ApiGetEndpointBody<Api, Endpoint>["schema"]
-  : never;
+export type ApiGetEndpointBodySchema<
+  Api extends ApiSpec,
+  Endpoint extends keyof Api["endpoints"],
+  $Body = ApiGetEndpointBody<Api, Endpoint>
+> = ApiGetSchemaOf<$Body>;
 
 /**
  * Get the endpoint body schema from an api spec using the endpoint path
@@ -485,7 +523,6 @@ export type ApiGetEndpointBodySchema<Api extends ApiSpec, Endpoint extends keyof
 export type ApiGetEndpointBodySchemaByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
-  Path extends ApiGetPathsByMethod<Api, Method>
-> = ApiGetEndpointBodyByPath<Api, Method, Path> extends ApiDataParameter
-  ? ApiGetEndpointBodyByPath<Api, Method, Path>["schema"]
-  : never;
+  Path extends ApiGetPathsByMethod<Api, Method>,
+  $Body = ApiGetEndpointBodyByPath<Api, Method, Path>
+> = ApiGetSchemaOf<$Body>;

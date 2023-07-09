@@ -1,4 +1,4 @@
-import { SchemaValidationResult, ApiTypeProvider, SchemaType } from "./schema-type.types";
+import type { SchemaValidationResult, ApiTypeProvider, SchemaType } from "./schema-type.types";
 
 const genericTsSchema = {
   parse: (data: unknown): SchemaValidationResult<any> => ({
