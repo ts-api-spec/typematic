@@ -4,9 +4,21 @@ import type { SchemaType } from "./schema-type.types";
  * Api specification
  */
 export interface ApiSpec {
+  /**
+   * Optional metadata for the api
+   */
   readonly metadata?: ApiMetadata;
+  /**
+   * Definitions for all the API endpoints
+   */
   readonly endpoints: Record<string, ApiEndpoint>;
+  /**
+   * Optional Definitions for security schemes
+   */
   readonly security?: ApiSecurity;
+  /**
+   * Optional Definitions for common schemas, usefull for reusing schemas when using json-schema or json-types
+   */
   readonly schemas?: Record<string, unknown>;
 }
 
@@ -14,7 +26,13 @@ export interface ApiSpec {
  * Api metadata about the available servers
  */
 export interface ApiServer {
+  /**
+   * URL of the server
+   */
   readonly url: string;
+  /**
+   * Alias name for the server
+   */
   readonly name: string;
 }
 
@@ -41,39 +59,39 @@ export interface ApiEndpoint {
    */
   readonly path: string;
   /**
-   * Query parameters for the endpoint
+   * Request Query parameters for the endpoint
    * a record of schemas or a record of api parameters
    */
   readonly query?: Record<string, ApiParameter | {}>;
   /**
-   * Path parameters for the endpoint
+   * Request Path parameters for the endpoint
    * a record of schemas or a record of api parameters
    */
   readonly params?: Record<string, ApiParameter | {}>;
   /**
-   * Headers for the endpoint
+   * Request Headers for the endpoint
    * a record of schemas or a record of api parameters
    */
   readonly headers?: {
     readonly [key in ApiHeaders]?: ApiParameter | {};
   };
   /**
-   * Cookies for the endpoint
+   * Request Cookies for the endpoint
    * a record of schemas or a record of api parameters
    */
   readonly cookies?: Record<string, ApiParameter | {}>;
   /**
-   * Body for the endpoint
+   * Request Body for the endpoint
    * can be a schema or an api data parameter
    */
-  readonly body?: ApiDataParameter | {};
+  readonly body?: ApiRequestBodyParameter | {};
   /**
    * Possible responses for the endpoint
    * The key is the HTTP status code
    * The key "default" is used for the default response (only use for error responses)
    */
   readonly responses: {
-    readonly [key in number | "default"]?: ApiDataParameter | {};
+    readonly [key in number | "default"]?: ApiResponseBodyParameter | {};
   };
 }
 
@@ -92,15 +110,35 @@ export interface ApiParameter {
 }
 
 /**
- * Describes the body of a request or response for an endpoint
+ * Describes the body of a request for an endpoint
  */
-export interface ApiDataParameter {
+export interface ApiRequestBodyParameter {
   /**
    * optional metadata for the parameter
    */
   readonly metadata?: ApiDataMetadata;
   /**
-   * Schema for the request or response body
+   * Schema for the request body
+   */
+  readonly schema: unknown;
+}
+
+/**
+ * Describes the body of a response for an endpoint
+ */
+export interface ApiResponseBodyParameter {
+  /**
+   * optional metadata for the parameter
+   */
+  readonly metadata?: ApiDataMetadata;
+  /**
+   * optional schemas for the response headers
+   */
+  readonly headers?: {
+    readonly [key in ApiHeaders]?: ApiParameter | {};
+  };
+  /**
+   * Schema for the response body
    */
   readonly schema: unknown;
 }
