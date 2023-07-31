@@ -1,14 +1,29 @@
 # Typematic - Zod
 
-Zod plugin for Typematic
-Allows to use `Zod` as a validation library for Typematic
+Valibot plugin for Typematic
+Allows to use `Valibot` as a validation library for Typematic
 
 ## Example
 
 ```typescript
-import { z } from "zod";
+import { array, number, object, string, instance, minValue, optional, undefinedType } from "valibot";
 import { apiSpecBuilder } from "@typematic/core";
-import { ApiZodSchema } from "@typematic/zod";
+import type {
+  ApiGetEndpoint,
+  ApiGetEndpointBody,
+  ApiGetEndpointCookies,
+  ApiGetEndpointHeaders,
+  ApiGetEndpointParams,
+  ApiGetEndpointQueries,
+  ApiGetEndpointQuery,
+  ApiGetEndpointResponse,
+  ApiInferEndpointInputBody,
+  ApiInferEndpointInputParam,
+  ApiInferEndpointInputQuery,
+  ApiInferEndpointOutputResponse,
+} from "@typematic/core";
+
+import { ApiValibotSchema } from "@typematic/valibot";
 
 const apiSpec = apiSpecBuilder({
   name: "my-api",
@@ -24,21 +39,21 @@ const apiSpec = apiSpecBuilder({
       name: "production",
     },
   ],
-  schemaType: ApiZodSchema,
+  schemaType: ApiValibotSchema,
 })
   .addEndpoint("getPosts", {
     method: "GET",
     path: "/posts",
     query: {
-      userId: z.number().optional(),
+      userId: optional(number([minValue(1)])),
     },
     responses: {
-      200: z.array(
-        z.object({
-          userId: z.number(),
-          id: z.number(),
-          title: z.string(),
-          body: z.string(),
+      200: array(
+        object({
+          userid: number(),
+          id: number(),
+          title: string(),
+          body: string(),
         })
       ),
     },
@@ -47,20 +62,20 @@ const apiSpec = apiSpecBuilder({
     method: "GET",
     path: "/posts/:id",
     params: {
-      id: z.number().min(1),
+      id: number([minValue(1)]),
     },
     responses: {
       /**
        * direct schema
        */
-      200: z.object({
-        userId: z.number(),
-        id: z.number(),
-        title: z.string(),
-        body: z.string(),
+      200: object({
+        userid: number(),
+        id: number(),
+        title: string(),
+        body: string(),
       }),
-      404: z.object({
-        message: z.string(),
+      404: object({
+        message: string(),
       }),
     },
   })
@@ -69,15 +84,15 @@ const apiSpec = apiSpecBuilder({
     path: "/posts/:id/attachment",
     // we can use the schema directly if no need for metadata
     params: {
-      id: z.number().min(1),
+      id: number([minValue(1)]),
     },
     body: {
       metadata: {
         description: "The file to attach",
         format: "form-data", // allows to specify the format of the body for the documentation and the client generation
       },
-      schema: z.object({
-        file: z.instanceof(File),
+      schema: object({
+        file: instance(File),
       }),
     },
     responses: {
@@ -85,7 +100,7 @@ const apiSpec = apiSpecBuilder({
         metadata: {
           description: "No content",
         },
-        schema: z.undefined(),
+        schema: undefinedType(),
       },
     },
   })
@@ -97,7 +112,7 @@ const apiSpec = apiSpecBuilder({
         metadata: {
           description: "The ID of the post",
         },
-        schema: z.number().min(1),
+        schema: number([minValue(1)]),
       },
     },
     responses: {
@@ -106,14 +121,14 @@ const apiSpec = apiSpecBuilder({
           description: "The file attached to the post",
           format: "blob", // allows to specify the format of the response for the documentation and the client generation
         },
-        schema: z.instanceof(Blob),
+        schema: instance(Blob),
       },
       404: {
         metadata: {
           description: "Not found",
         },
-        schema: z.object({
-          message: z.string(),
+        schema: object({
+          message: string(),
         }),
       },
     },
