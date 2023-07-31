@@ -3,7 +3,7 @@ import * as t from "io-ts";
 
 import { ApiIoTsSchema } from "./index";
 
-describe("ApiEffectSchema", () => {
+describe("ApiIoTsSchema", () => {
   it("should validate schema", () => {
     const schema = ApiIoTsSchema;
     const result = schema.validate(t.number, 123);

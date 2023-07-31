@@ -1,14 +1,14 @@
-# Typematic - Yup
+# Typematic - Zod
 
-Yup plugin for Typematic
-Allows to use `Yup` as a validation library for Typematic
+Zod plugin for Typematic
+Allows to use `Zod` as a validation library for Typematic
 
 ## Example
 
 ```typescript
-import * as y from "yup";
+import { z } from "zod";
 import { apiSpecBuilder } from "@typematic/core";
-import { ApiYupSchema } from "@typematic/yup";
+import { ApiZodSchema } from "@typematic/zod";
 
 const apiSpec = apiSpecBuilder({
   name: "my-api",
@@ -24,50 +24,44 @@ const apiSpec = apiSpecBuilder({
       name: "production",
     },
   ],
-  schemaType: ApiYupSchema,
+  schemaType: ApiZodSchema,
 })
   .addEndpoint("getPosts", {
     method: "GET",
     path: "/posts",
     query: {
-      userId: y.number(),
+      userId: z.number().optional(),
     },
     responses: {
-      200: y
-        .array(
-          y.object({
-            userId: y.number().required(),
-            id: y.number().required(),
-            title: y.string().required(),
-            body: y.string().required(),
-          })
-        )
-        .required(),
+      200: z.array(
+        z.object({
+          userId: z.number(),
+          id: z.number(),
+          title: z.string(),
+          body: z.string(),
+        })
+      ),
     },
   })
   .addEndpoint("getPostsById", {
     method: "GET",
     path: "/posts/:id",
     params: {
-      id: y.number().min(1).required(),
+      id: z.number().min(1),
     },
     responses: {
       /**
        * direct schema
        */
-      200: y
-        .object({
-          userId: y.number().required(),
-          id: y.number().required(),
-          title: y.string().required(),
-          body: y.string().required(),
-        })
-        .required(),
-      404: y
-        .object({
-          message: y.string().required(),
-        })
-        .required(),
+      200: z.object({
+        userId: z.number(),
+        id: z.number(),
+        title: z.string(),
+        body: z.string(),
+      }),
+      404: z.object({
+        message: z.string(),
+      }),
     },
   })
   .addEndpoint("attachFile", {
@@ -75,15 +69,15 @@ const apiSpec = apiSpecBuilder({
     path: "/posts/:id/attachment",
     // we can use the schema directly if no need for metadata
     params: {
-      id: y.number().min(1).required(),
+      id: z.number().min(1),
     },
     body: {
       metadata: {
         description: "The file to attach",
         format: "form-data", // allows to specify the format of the body for the documentation and the client generation
       },
-      schema: y.object({
-        file: y.mixed((input): input is File => input instanceof File).required(),
+      schema: z.object({
+        file: z.instanceof(File),
       }),
     },
     responses: {
@@ -91,7 +85,7 @@ const apiSpec = apiSpecBuilder({
         metadata: {
           description: "No content",
         },
-        schema: y.object({}),
+        schema: z.undefined(),
       },
     },
   })
@@ -103,7 +97,7 @@ const apiSpec = apiSpecBuilder({
         metadata: {
           description: "The ID of the post",
         },
-        schema: y.number().min(1).required(),
+        schema: z.number().min(1),
       },
     },
     responses: {
@@ -112,14 +106,14 @@ const apiSpec = apiSpecBuilder({
           description: "The file attached to the post",
           format: "blob", // allows to specify the format of the response for the documentation and the client generation
         },
-        schema: y.mixed((input): input is Blob => input instanceof Blob).required(),
+        schema: z.instanceof(Blob),
       },
       404: {
         metadata: {
           description: "Not found",
         },
-        schema: y.object({
-          message: y.string().required(),
+        schema: z.object({
+          message: z.string(),
         }),
       },
     },

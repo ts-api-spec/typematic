@@ -4,7 +4,7 @@ import { TSchema, Type } from "@sinclair/typebox";
 import { ApiTypeboxSchema } from "./index";
 import { TypeCheck } from "@sinclair/typebox/compiler";
 
-describe("ApiEffectSchema", () => {
+describe("ApiTypeboxSchema", () => {
   it("should validate schema", () => {
     const schema = ApiTypeboxSchema;
     const result = schema.validate(Type.Number({ minimum: 0 }), 123);

@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { ApiZodSchema } from "./index";
 
-describe("ApiEffectSchema", () => {
+describe("ApiZodSchema", () => {
   it("should validate schema", () => {
     const schema = ApiZodSchema;
     const result = schema.validate(z.number().positive(), 123);

@@ -1,11 +1,11 @@
 import { describe, it, expect, assert, expectTypeOf } from "vitest";
 import * as y from "yup";
 
-import { ApiZodSchema } from "./index";
+import { ApiYupSchema } from "./index";
 
-describe("ApiEffectSchema", () => {
+describe("ApiYuptSchema", () => {
   it("should validate schema", () => {
-    const schema = ApiZodSchema;
+    const schema = ApiYupSchema;
     const result = schema.validate(y.number().positive().required(), 123);
     assert(result.success);
     expectTypeOf(result.data).toEqualTypeOf<number>();
@@ -13,7 +13,7 @@ describe("ApiEffectSchema", () => {
   });
 
   it("should validate schema async", async () => {
-    const schema = ApiZodSchema;
+    const schema = ApiYupSchema;
     const result = await schema.validateAsync(y.number().positive().required(), 123);
     assert(result.success);
     expectTypeOf(result.data).toEqualTypeOf<number>();
@@ -21,7 +21,7 @@ describe("ApiEffectSchema", () => {
   });
 
   it("should not validate schema with invalid input", () => {
-    const schema = ApiZodSchema;
+    const schema = ApiYupSchema;
     const result = schema.validate(y.number().positive().required(), -123);
     assert(!result.success);
     expectTypeOf(result.error).toEqualTypeOf<y.ValidationError>();

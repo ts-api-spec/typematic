@@ -7,7 +7,7 @@ import type { Split, SplitMany } from "./utils.types";
  * because some libraries like superstruct use an internal schema property
  * that clashes with the ApiParameter type
  */
-export type GenericSchema = { validate: (...arg: any) => any };
+export type GenericSchema = { validate: (...arg: any) => any } | { parse: (...arg: any) => any };
 
 /**
  * Get the schema of any request entry or response entry

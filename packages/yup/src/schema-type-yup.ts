@@ -8,7 +8,7 @@ export interface YupTypeProvider extends ApiTypeProvider {
   base: Schema;
 }
 
-export const ApiZodSchema: SchemaType<YupTypeProvider> = {
+export const ApiYupSchema: SchemaType<YupTypeProvider> = {
   validate: (schema, input) => {
     try {
       const result = schema.validateSync(input);

@@ -3,7 +3,7 @@ import { describe, it, expect, expectTypeOf, assert } from "vitest";
 import { ApiJsonSchema } from "./index";
 import { ErrorObject } from "ajv";
 
-describe("ApiJsonTypeSchema", () => {
+describe("ApiJsonSchema", () => {
   it("should validate schema", () => {
     const schema = ApiJsonSchema;
     const result = schema.validate(
@@ -38,7 +38,7 @@ describe("ApiJsonTypeSchema", () => {
       {
         type: "integer",
         minimum: 0,
-      },
+      } as const,
       -123
     );
     assert(!result.success);

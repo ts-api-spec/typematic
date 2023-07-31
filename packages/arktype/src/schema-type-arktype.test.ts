@@ -3,7 +3,7 @@ import { Problems, type } from "arktype";
 
 import { ApiArktypeSchema } from "./index";
 
-describe("ApiEffectSchema", () => {
+describe("ApiArktypeSchema", () => {
   it("should validate schema", () => {
     const schema = ApiArktypeSchema;
     const result = schema.validate(type("number>=0"), 123);

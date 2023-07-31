@@ -3,7 +3,7 @@ import * as S from "superstruct";
 
 import { ApiSuperstructSchema } from "./index";
 
-describe("ApiEffectSchema", () => {
+describe("ApiSuperstructSchema", () => {
   it("should validate schema", () => {
     const schema = ApiSuperstructSchema;
     const result = schema.validate(S.min(S.number(), 1), 123);

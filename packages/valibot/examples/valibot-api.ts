@@ -1,4 +1,4 @@
-import * as y from "yup";
+import { array, number, object, string, instance, minValue, optional, undefinedType } from "valibot";
 import { apiSpecBuilder } from "@typematic/core";
 import type {
   ApiGetEndpoint,
@@ -15,7 +15,7 @@ import type {
   ApiInferEndpointOutputResponse,
 } from "@typematic/core";
 
-import { ApiYupSchema } from "../src";
+import { ApiValibotSchema } from "../src";
 
 const apiSpec = apiSpecBuilder({
   name: "my-api",
@@ -31,50 +31,44 @@ const apiSpec = apiSpecBuilder({
       name: "production",
     },
   ],
-  schemaType: ApiYupSchema,
+  schemaType: ApiValibotSchema,
 })
   .addEndpoint("getPosts", {
     method: "GET",
     path: "/posts",
     query: {
-      userId: y.number(),
+      userId: optional(number([minValue(1)])),
     },
     responses: {
-      200: y
-        .array(
-          y.object({
-            userId: y.number().required(),
-            id: y.number().required(),
-            title: y.string().required(),
-            body: y.string().required(),
-          })
-        )
-        .required(),
+      200: array(
+        object({
+          userid: number(),
+          id: number(),
+          title: string(),
+          body: string(),
+        })
+      ),
     },
   })
   .addEndpoint("getPostsById", {
     method: "GET",
     path: "/posts/:id",
     params: {
-      id: y.number().min(1).required(),
+      id: number([minValue(1)]),
     },
     responses: {
       /**
        * direct schema
        */
-      200: y
-        .object({
-          userId: y.number().required(),
-          id: y.number().required(),
-          title: y.string().required(),
-          body: y.string().required(),
-        })
-        .required(),
-      404: y
-        .object({
-          message: y.string().required(),
-        })
-        .required(),
+      200: object({
+        userid: number(),
+        id: number(),
+        title: string(),
+        body: string(),
+      }),
+      404: object({
+        message: string(),
+      }),
     },
   })
   .addEndpoint("attachFile", {
@@ -82,15 +76,15 @@ const apiSpec = apiSpecBuilder({
     path: "/posts/:id/attachment",
     // we can use the schema directly if no need for metadata
     params: {
-      id: y.number().min(1).required(),
+      id: number([minValue(1)]),
     },
     body: {
       metadata: {
         description: "The file to attach",
         format: "form-data", // allows to specify the format of the body for the documentation and the client generation
       },
-      schema: y.object({
-        file: y.mixed((input): input is File => input instanceof File).required(),
+      schema: object({
+        file: instance(File),
       }),
     },
     responses: {
@@ -98,7 +92,7 @@ const apiSpec = apiSpecBuilder({
         metadata: {
           description: "No content",
         },
-        schema: y.object({}),
+        schema: undefinedType(),
       },
     },
   })
@@ -110,7 +104,7 @@ const apiSpec = apiSpecBuilder({
         metadata: {
           description: "The ID of the post",
         },
-        schema: y.number().min(1).required(),
+        schema: number([minValue(1)]),
       },
     },
     responses: {
@@ -119,14 +113,14 @@ const apiSpec = apiSpecBuilder({
           description: "The file attached to the post",
           format: "blob", // allows to specify the format of the response for the documentation and the client generation
         },
-        schema: y.mixed((input): input is Blob => input instanceof Blob).required(),
+        schema: instance(Blob),
       },
       404: {
         metadata: {
           description: "Not found",
         },
-        schema: y.object({
-          message: y.string().required(),
+        schema: object({
+          message: string(),
         }),
       },
     },
