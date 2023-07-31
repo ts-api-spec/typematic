@@ -1,4 +1,4 @@
-# Typematic - Zod
+# Typematic - Valibot
 
 Valibot plugin for Typematic
 Allows to use `Valibot` as a validation library for Typematic
