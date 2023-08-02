@@ -21,8 +21,27 @@ import type { InferInputTypeFromSchema, InferOutputTypeFromSchema, SchemaType } 
 import { ApiTypeScriptSchema } from "./schema-type-ts";
 
 declare global {
+
+  /**
+   * Schema type registry
+   *
+   * Allows to register custom schema default schema type
+   * 
+   * The default schema type is used when no schema type is defined in the api spec
+   * 
+   * If Api spec implementors want to use a different schema type, they can register a new one by overriding the default
+   * 
+   * @example
+   * ```ts
+   * declare global {
+   *  interface SchemaTypeRegistry {
+   *   default(): typeof MyCustomSchemaType;
+   *  }
+   * }
+   * ```
+   */
   export interface SchemaTypeRegistry {
-    default: typeof ApiTypeScriptSchema;
+    default(): typeof ApiTypeScriptSchema;
   }
 }
 
@@ -37,8 +56,8 @@ export type ApiGetSchemaType<
 > = Api["metadata"] extends infer $Metadata extends ApiBaseMetadata
   ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
   ? $SchemaType
-  : SchemaTypeRegistry["default"]
-  : SchemaTypeRegistry["default"];
+  : ReturnType<SchemaTypeRegistry['default']>
+  : ReturnType<SchemaTypeRegistry['default']>
 
 /**
  * Get the schema type for an endpoint by looking at the metadata
