@@ -20,21 +20,25 @@ import type {
 import type { InferInputTypeFromSchema, InferOutputTypeFromSchema, SchemaType } from "./schema-type.types";
 import { ApiTypeScriptSchema } from "./schema-type-ts";
 
+declare global {
+  export interface SchemaTypeRegistry {
+    default: typeof ApiTypeScriptSchema;
+  }
+}
+
 /**
  * Get the schema type for the api spec by looking at the metadata
  * Allows to define a default schema type for the api spec if none is defined
  * @param Api - Api spec
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Schema type
  */
 export type ApiGetSchemaType<
   Api extends ApiSpec,
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
 > = Api["metadata"] extends infer $Metadata extends ApiBaseMetadata
   ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
   ? $SchemaType
-  : DefaultSchemaType
-  : DefaultSchemaType;
+  : SchemaTypeRegistry["default"]
+  : SchemaTypeRegistry["default"];
 
 /**
  * Get the schema type for an endpoint by looking at the metadata
@@ -42,19 +46,17 @@ export type ApiGetSchemaType<
  * Allows to define a default schema type if none is defined in any of the metadata
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Schema type
  */
 export type ApiGetEndpointSchemaType<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
   $Endpoint extends ApiEndpoint = ApiGetEndpoint<Api, Endpoint>
 > = $Endpoint["metadata"] extends infer $Metadata extends ApiBaseMetadata
   ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
   ? $SchemaType
-  : ApiGetSchemaType<Api, DefaultSchemaType>
-  : ApiGetSchemaType<Api, DefaultSchemaType>;
+  : ApiGetSchemaType<Api>
+  : ApiGetSchemaType<Api>;
 
 /**
  * Get the schema type for an endpoint by looking at the metadata
@@ -63,20 +65,18 @@ export type ApiGetEndpointSchemaType<
  * @param Api - Api spec
  * @param Method - HTTP method
  * @param Path - Endpoint path
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Schema type
  */
 export type ApiGetEndpointSchemaTypeByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
   $Endpoint extends ApiEndpoint = ApiGetEndpointByPath<Api, Method, Path>
 > = $Endpoint["metadata"] extends infer $Metadata extends ApiBaseMetadata
   ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
   ? $SchemaType
-  : ApiGetSchemaType<Api, DefaultSchemaType>
-  : ApiGetSchemaType<Api, DefaultSchemaType>;
+  : ApiGetSchemaType<Api>
+  : ApiGetSchemaType<Api>;
 
 /**
  * Get the schema type for the body of an endpoint by looking at the metadata
@@ -85,20 +85,18 @@ export type ApiGetEndpointSchemaTypeByPath<
  * Allows to define a default schema type if none is defined in any of the metadata
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Schema type
  */
 export type ApiGetEndpointBodySchemaType<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
 > = ApiGetEndpointBody<Api, Endpoint> extends infer $Body extends ApiRequestBodyParameter
   ? $Body["metadata"] extends infer $Metadata extends ApiBaseMetadata
   ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
   ? $SchemaType
-  : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
-  : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
-  : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>;
+  : ApiGetEndpointSchemaType<Api, Endpoint>
+  : ApiGetEndpointSchemaType<Api, Endpoint>
+  : ApiGetEndpointSchemaType<Api, Endpoint>;
 
 /**
  * Get the schema type for the body of an endpoint by looking at the metadata
@@ -108,21 +106,19 @@ export type ApiGetEndpointBodySchemaType<
  * @param Api - Api spec
  * @param Method - HTTP method
  * @param Path - Endpoint path
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Schema type
  */
 export type ApiGetEndpointBodySchemaTypeByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
 > = ApiGetEndpointBodyByPath<Api, Method, Path> extends infer $Body extends ApiRequestBodyParameter
   ? $Body["metadata"] extends infer $Metadata extends ApiBaseMetadata
   ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
   ? $SchemaType
-  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>
-  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>
-  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>;
+  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>
+  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>
+  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>;
 
 /**
  * Get the schema type for an entry of an endpoint by looking at the metadata
@@ -133,7 +129,6 @@ export type ApiGetEndpointBodySchemaTypeByPath<
  * @param Endpoint - Endpoint name
  * @param Entry - Entry name
  * @param EntryParam - Entry parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Schema type
  */
 export type ApiGetEndpointEntrySchemaType<
@@ -141,14 +136,13 @@ export type ApiGetEndpointEntrySchemaType<
   Endpoint extends keyof Api["endpoints"],
   Entry extends ApiEntry,
   EntryParam extends keyof ApiGetEndpoint<Api, Endpoint>[Entry],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
 > = ApiGetEndpoint<Api, Endpoint>[Entry][EntryParam] extends infer $Entry extends ApiParameter
   ? $Entry["metadata"] extends infer $Metadata extends ApiBaseMetadata
   ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
   ? $SchemaType
-  : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
-  : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
-  : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>;
+  : ApiGetEndpointSchemaType<Api, Endpoint>
+  : ApiGetEndpointSchemaType<Api, Endpoint>
+  : ApiGetEndpointSchemaType<Api, Endpoint>;
 
 /**
  * Get the schema type for an entry of an endpoint by looking at the metadata
@@ -160,7 +154,6 @@ export type ApiGetEndpointEntrySchemaType<
  * @param Path - Endpoint path
  * @param Entry - Entry name
  * @param EntryParam - Entry parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Schema type
  */
 export type ApiGetEndpointEntrySchemaTypeByPath<
@@ -169,14 +162,13 @@ export type ApiGetEndpointEntrySchemaTypeByPath<
   Path extends ApiGetPathsByMethod<Api, Method>,
   Entry extends ApiEntry,
   EntryParam extends keyof ApiGetEndpointByPath<Api, Method, Path>[Entry],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
 > = ApiGetEndpointByPath<Api, Method, Path>[Entry][EntryParam] extends infer $Entry extends ApiParameter
   ? $Entry["metadata"] extends infer $Metadata extends ApiBaseMetadata
   ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
   ? $SchemaType
-  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>
-  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>
-  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>;
+  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>
+  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>
+  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>;
 
 /**
  * Infer the typescript input type for an endpoint body
@@ -189,14 +181,12 @@ export type ApiGetEndpointEntrySchemaTypeByPath<
  * 4. Else use the default schema type
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint body
  */
 export type ApiInferEndpointInputBody<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
-  $SchemaType extends SchemaType = ApiGetEndpointBodySchemaType<Api, Endpoint, DefaultSchemaType>,
+  $SchemaType extends SchemaType = ApiGetEndpointBodySchemaType<Api, Endpoint>,
   $Schema = ApiGetEndpointBodySchema<Api, Endpoint>
 > = InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Schema>;
 
@@ -212,15 +202,13 @@ export type ApiInferEndpointInputBody<
  * @param Api - Api spec
  * @param Method - HTTP method
  * @param Path - Endpoint path
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint body
  */
 export type ApiInferEndpointInputBodyByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
-  $SchemaType extends SchemaType = ApiGetEndpointBodySchemaTypeByPath<Api, Method, Path, DefaultSchemaType>,
+  $SchemaType extends SchemaType = ApiGetEndpointBodySchemaTypeByPath<Api, Method, Path>,
   $Schema = ApiGetEndpointBodySchemaByPath<Api, Method, Path>
 > = InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Schema>;
 
@@ -235,14 +223,12 @@ export type ApiInferEndpointInputBodyByPath<
  * 4. Else use the default schema type
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Output type for the endpoint body
  */
 export type ApiInferEndpointOutputBody<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
-  $SchemaType extends SchemaType = ApiGetEndpointBodySchemaType<Api, Endpoint, DefaultSchemaType>,
+  $SchemaType extends SchemaType = ApiGetEndpointBodySchemaType<Api, Endpoint>,
   $Schema = ApiGetEndpointBodySchema<Api, Endpoint>
 > = InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Schema>;
 
@@ -258,15 +244,13 @@ export type ApiInferEndpointOutputBody<
  * @param Api - Api spec
  * @param Method - HTTP method
  * @param Path - Endpoint path
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Output type for the endpoint body
  */
 export type ApiInferEndpointOutputBodyByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
-  $SchemaType extends SchemaType = ApiGetEndpointBodySchemaTypeByPath<Api, Method, Path, DefaultSchemaType>,
+  $SchemaType extends SchemaType = ApiGetEndpointBodySchemaTypeByPath<Api, Method, Path>,
   $Schema = ApiGetEndpointBodySchemaByPath<Api, Method, Path>
 > = InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, $Schema>;
 
@@ -283,7 +267,6 @@ export type ApiInferEndpointOutputBodyByPath<
  * @param Endpoint - Endpoint name
  * @param Entry - Entry name
  * @param EntryParam - Entry parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint entry
  */
 export type ApiInferEndpointInputEntry<
@@ -291,8 +274,7 @@ export type ApiInferEndpointInputEntry<
   Endpoint extends keyof Api["endpoints"],
   Entry extends ApiEntry,
   EntryParam extends keyof ApiGetEndpoint<Api, Endpoint>[Entry],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
-  $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaType<Api, Endpoint, Entry, EntryParam, DefaultSchemaType>,
+  $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaType<Api, Endpoint, Entry, EntryParam>,
   $EntryParam = ApiGetEndpoint<Api, Endpoint>[Entry][EntryParam]
 > = InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, ApiGetSchemaOf<$EntryParam>>;
 
@@ -310,7 +292,6 @@ export type ApiInferEndpointInputEntry<
  * @param Path - Endpoint path
  * @param Entry - Entry name
  * @param EntryParam - Entry parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint entry
  */
 export type ApiInferEndpointInputEntryByPath<
@@ -319,14 +300,12 @@ export type ApiInferEndpointInputEntryByPath<
   Path extends ApiGetPathsByMethod<Api, Method>,
   Entry extends ApiEntry,
   EntryParam extends keyof ApiGetEndpointByPath<Api, Method, Path>[Entry],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
   $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaTypeByPath<
     Api,
     Method,
     Path,
     Entry,
-    EntryParam,
-    DefaultSchemaType
+    EntryParam
   >,
   $EntryParam = ApiGetEndpointByPath<Api, Method, Path>[Entry][EntryParam]
 > = InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, ApiGetSchemaOf<$EntryParam>>;
@@ -344,7 +323,6 @@ export type ApiInferEndpointInputEntryByPath<
  * @param Endpoint - Endpoint name
  * @param Entry - Entry name
  * @param EntryParam - Entry parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Output type for the endpoint entry
  */
 export type ApiInferEndpointOutputEntry<
@@ -352,8 +330,7 @@ export type ApiInferEndpointOutputEntry<
   Endpoint extends keyof Api["endpoints"],
   Entry extends ApiEntry,
   EntryParam extends keyof ApiGetEndpoint<Api, Endpoint>[Entry],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
-  $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaType<Api, Endpoint, Entry, EntryParam, DefaultSchemaType>,
+  $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaType<Api, Endpoint, Entry, EntryParam>,
   $EntryParam = ApiGetEndpoint<Api, Endpoint>[Entry][EntryParam]
 > = InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, ApiGetSchemaOf<$EntryParam>>;
 
@@ -371,7 +348,6 @@ export type ApiInferEndpointOutputEntry<
  * @param Path - Endpoint path
  * @param Entry - Entry name
  * @param EntryParam - Entry parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Output type for the endpoint entry
  */
 export type ApiInferEndpointOutputEntryByPath<
@@ -380,14 +356,12 @@ export type ApiInferEndpointOutputEntryByPath<
   Path extends ApiGetPathsByMethod<Api, Method>,
   Entry extends ApiEntry,
   EntryParam extends keyof ApiGetEndpointByPath<Api, Method, Path>[Entry],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema,
   $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaTypeByPath<
     Api,
     Method,
     Path,
     Entry,
-    EntryParam,
-    DefaultSchemaType
+    EntryParam
   >,
   $EntryParam = ApiGetEndpointByPath<Api, Method, Path>[Entry][EntryParam]
 > = InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, ApiGetSchemaOf<$EntryParam>>;
@@ -404,15 +378,13 @@ export type ApiInferEndpointOutputEntryByPath<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param PathParam - Path parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint path parameter
  */
 export type ApiInferEndpointInputParam<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   PathParam extends keyof ApiGetEndpoint<Api, Endpoint>["params"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointInputEntry<Api, Endpoint, "params", PathParam, DefaultSchemaType>;
+> = ApiInferEndpointInputEntry<Api, Endpoint, "params", PathParam>;
 
 /**
  * Infer the typescript input type for an endpoint path parameter
@@ -427,7 +399,6 @@ export type ApiInferEndpointInputParam<
  * @param Method - HTTP method
  * @param Path - Endpoint path
  * @param PathParam - Path parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint path parameter
  */
 export type ApiInferEndpointInputParamByPath<
@@ -435,8 +406,7 @@ export type ApiInferEndpointInputParamByPath<
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
   PathParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["params"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointInputEntryByPath<Api, Method, Path, "params", PathParam, DefaultSchemaType>;
+> = ApiInferEndpointInputEntryByPath<Api, Method, Path, "params", PathParam>;
 
 /**
  * Infer the typescript input type for an endpoint query parameter
@@ -450,15 +420,13 @@ export type ApiInferEndpointInputParamByPath<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param QueryParam - Query parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint query parameter
  */
 export type ApiInferEndpointInputQuery<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   QueryParam extends keyof ApiGetEndpoint<Api, Endpoint>["query"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointInputEntry<Api, Endpoint, "query", QueryParam, DefaultSchemaType>;
+> = ApiInferEndpointInputEntry<Api, Endpoint, "query", QueryParam>;
 
 /**
  * Infer the typescript input type for an endpoint query parameter
@@ -472,7 +440,6 @@ export type ApiInferEndpointInputQuery<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param QueryParam - Query parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint query parameter
  */
 export type ApiInferEndpointInputQueryByPath<
@@ -480,8 +447,7 @@ export type ApiInferEndpointInputQueryByPath<
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
   QueryParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["query"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointInputEntryByPath<Api, Method, Path, "query", QueryParam, DefaultSchemaType>;
+> = ApiInferEndpointInputEntryByPath<Api, Method, Path, "query", QueryParam>;
 
 /**
  * Infer the typescript input type for an endpoint header parameter
@@ -495,15 +461,13 @@ export type ApiInferEndpointInputQueryByPath<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param HeaderParam - Header parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint header parameter
  */
 export type ApiInferEndpointInputHeader<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   HeaderParam extends keyof ApiGetEndpoint<Api, Endpoint>["headers"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointInputEntry<Api, Endpoint, "headers", HeaderParam, DefaultSchemaType>;
+> = ApiInferEndpointInputEntry<Api, Endpoint, "headers", HeaderParam>;
 
 /**
  * Infer the typescript input type for an endpoint header parameter
@@ -517,7 +481,6 @@ export type ApiInferEndpointInputHeader<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param HeaderParam - Header parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint header parameter
  */
 export type ApiInferEndpointInputHeaderByPath<
@@ -525,8 +488,7 @@ export type ApiInferEndpointInputHeaderByPath<
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
   HeaderParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["headers"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointInputEntryByPath<Api, Method, Path, "headers", HeaderParam, DefaultSchemaType>;
+> = ApiInferEndpointInputEntryByPath<Api, Method, Path, "headers", HeaderParam>;
 
 /**
  * Infer the typescript input type for an endpoint cookie parameter
@@ -540,15 +502,13 @@ export type ApiInferEndpointInputHeaderByPath<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param CookieParam - Cookie parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint cookie parameter
  */
 export type ApiInferEndpointInputCookie<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   CookieParam extends keyof ApiGetEndpoint<Api, Endpoint>["cookies"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointInputEntry<Api, Endpoint, "cookies", CookieParam, DefaultSchemaType>;
+> = ApiInferEndpointInputEntry<Api, Endpoint, "cookies", CookieParam>;
 
 /**
  * Infer the typescript input type for an endpoint cookie parameter
@@ -562,7 +522,6 @@ export type ApiInferEndpointInputCookie<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param CookieParam - Cookie parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint cookie parameter
  */
 export type ApiInferEndpointInputCookieByPath<
@@ -570,8 +529,7 @@ export type ApiInferEndpointInputCookieByPath<
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
   CookieParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["cookies"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointInputEntryByPath<Api, Method, Path, "cookies", CookieParam, DefaultSchemaType>;
+> = ApiInferEndpointInputEntryByPath<Api, Method, Path, "cookies", CookieParam>;
 
 /**
  * Infer the typescript input type for an endpoint response body
@@ -585,15 +543,13 @@ export type ApiInferEndpointInputCookieByPath<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param StatusCode - Response status code
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint response body
  */
 export type ApiInferEndpointInputResponse<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   StatusCode extends keyof ApiGetEndpoint<Api, Endpoint>["responses"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointInputEntry<Api, Endpoint, "responses", StatusCode, DefaultSchemaType>;
+> = ApiInferEndpointInputEntry<Api, Endpoint, "responses", StatusCode>;
 
 /**
  * Infer the typescript input type for an endpoint response body
@@ -607,7 +563,6 @@ export type ApiInferEndpointInputResponse<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param StatusCode - Response status code
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Input type for the endpoint response body
  */
 export type ApiInferEndpointInputResponseByPath<
@@ -615,8 +570,7 @@ export type ApiInferEndpointInputResponseByPath<
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
   StatusCode extends keyof ApiGetEndpointByPath<Api, Method, Path>["responses"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointInputEntryByPath<Api, Method, Path, "responses", StatusCode, DefaultSchemaType>;
+> = ApiInferEndpointInputEntryByPath<Api, Method, Path, "responses", StatusCode>;
 
 /**
  * Infer the typescript output type for an endpoint path parameter
@@ -630,15 +584,13 @@ export type ApiInferEndpointInputResponseByPath<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param PathParam - Path parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Output type for the endpoint path parameter
  */
 export type ApiInferEndpointOutputParam<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   PathParam extends keyof ApiGetEndpoint<Api, Endpoint>["params"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointOutputEntry<Api, Endpoint, "params", PathParam, DefaultSchemaType>;
+> = ApiInferEndpointOutputEntry<Api, Endpoint, "params", PathParam>;
 
 /**
  * Infer the typescript output type for an endpoint path parameter
@@ -652,7 +604,6 @@ export type ApiInferEndpointOutputParam<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param PathParam - Path parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Output type for the endpoint path parameter
  */
 export type ApiInferEndpointOutputParamByPath<
@@ -660,8 +611,7 @@ export type ApiInferEndpointOutputParamByPath<
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
   PathParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["params"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "params", PathParam, DefaultSchemaType>;
+> = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "params", PathParam>;
 
 /**
  * Infer the typescript output type for an endpoint query parameter
@@ -675,15 +625,13 @@ export type ApiInferEndpointOutputParamByPath<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param QueryParam - Query parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Output type for the endpoint query parameter
  */
 export type ApiInferEndpointOutputQuery<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   QueryParam extends keyof ApiGetEndpoint<Api, Endpoint>["query"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointOutputEntry<Api, Endpoint, "query", QueryParam, DefaultSchemaType>;
+> = ApiInferEndpointOutputEntry<Api, Endpoint, "query", QueryParam>;
 
 /**
  * Infer the typescript output type for an endpoint query parameter
@@ -697,7 +645,6 @@ export type ApiInferEndpointOutputQuery<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param QueryParam - Query parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Output type for the endpoint query parameter
  */
 export type ApiInferEndpointOutputQueryByPath<
@@ -705,8 +652,7 @@ export type ApiInferEndpointOutputQueryByPath<
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
   QueryParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["query"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "query", QueryParam, DefaultSchemaType>;
+> = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "query", QueryParam>;
 
 /**
  * Infer the typescript output type for an endpoint header parameter
@@ -720,15 +666,13 @@ export type ApiInferEndpointOutputQueryByPath<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param HeaderParam - Header parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Output type for the endpoint header parameter
  */
 export type ApiInferEndpointOutputHeader<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   HeaderParam extends keyof ApiGetEndpoint<Api, Endpoint>["headers"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointOutputEntry<Api, Endpoint, "headers", HeaderParam, DefaultSchemaType>;
+> = ApiInferEndpointOutputEntry<Api, Endpoint, "headers", HeaderParam>;
 
 /**
  * Infer the typescript output type for an endpoint header parameter
@@ -742,7 +686,6 @@ export type ApiInferEndpointOutputHeader<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param HeaderParam - Header parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Output type for the endpoint header parameter
  */
 export type ApiInferEndpointOutputHeaderByPath<
@@ -750,8 +693,7 @@ export type ApiInferEndpointOutputHeaderByPath<
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
   HeaderParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["headers"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "headers", HeaderParam, DefaultSchemaType>;
+> = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "headers", HeaderParam>;
 
 /**
  * Infer the typescript output type for an endpoint cookie parameter
@@ -765,15 +707,13 @@ export type ApiInferEndpointOutputHeaderByPath<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param CookieParam - Cookie parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Output type for the endpoint cookie parameter
  */
 export type ApiInferEndpointOutputCookie<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   CookieParam extends keyof ApiGetEndpoint<Api, Endpoint>["cookies"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointOutputEntry<Api, Endpoint, "cookies", CookieParam, DefaultSchemaType>;
+> = ApiInferEndpointOutputEntry<Api, Endpoint, "cookies", CookieParam>;
 
 /**
  * Infer the typescript output type for an endpoint cookie parameter
@@ -787,7 +727,6 @@ export type ApiInferEndpointOutputCookie<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param CookieParam - Cookie parameter name
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Output type for the endpoint cookie parameter
  */
 export type ApiInferEndpointOutputCookieByPath<
@@ -795,8 +734,7 @@ export type ApiInferEndpointOutputCookieByPath<
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
   CookieParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["cookies"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "cookies", CookieParam, DefaultSchemaType>;
+> = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "cookies", CookieParam>;
 
 /**
  * Infer the typescript output type for an endpoint response body
@@ -810,15 +748,13 @@ export type ApiInferEndpointOutputCookieByPath<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param StatusCode - Response status code
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Output type for the endpoint response body
  */
 export type ApiInferEndpointOutputResponse<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   StatusCode extends keyof ApiGetEndpoint<Api, Endpoint>["responses"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointOutputEntry<Api, Endpoint, "responses", StatusCode, DefaultSchemaType>;
+> = ApiInferEndpointOutputEntry<Api, Endpoint, "responses", StatusCode>;
 
 /**
  * Infer the typescript output type for an endpoint response body
@@ -832,7 +768,6 @@ export type ApiInferEndpointOutputResponse<
  * @param Api - Api spec
  * @param Endpoint - Endpoint name
  * @param StatusCode - Response status code
- * @param DefaultSchemaType - Optional schema type to use if none is defined, defaults to TypeScript schema
  * @returns Typescript Output type for the endpoint response body
  */
 export type ApiInferEndpointOutputResponseByPath<
@@ -840,5 +775,4 @@ export type ApiInferEndpointOutputResponseByPath<
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
   StatusCode extends keyof ApiGetEndpointByPath<Api, Method, Path>["responses"],
-  DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
-> = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "responses", StatusCode, DefaultSchemaType>;
+> = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "responses", StatusCode>;
