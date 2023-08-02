@@ -133,36 +133,50 @@ const apiSpec = apiSpecBuilder({
   .build();
 
 type T0 = ApiGetEndpoint<typeof apiSpec, "getPosts">;
-//   ^?
-type T1 = ApiGetEndpointBody<typeof apiSpec, "getPosts">;
-//   ^?
+//    ^?
+
+type T100 = ApiGetEndpointBody<typeof apiSpec, "getPosts">;
+//    ^?
+
 type T2 = ApiGetEndpointParams<typeof apiSpec, "getPosts">;
-//   ^?
+//    ^?
+
 type T3 = ApiGetEndpointQueries<typeof apiSpec, "getPosts">;
-//   ^?
+//    ^?
+
 type T3_1 = ApiGetEndpointQuery<typeof apiSpec, "getPosts", "userId">;
-//   ^?
+//    ^?
+
 type T4 = ApiGetEndpointHeaders<typeof apiSpec, "getPosts">;
-//   ^?
+//    ^?
+
 type T5 = ApiGetEndpointCookies<typeof apiSpec, "getPosts">;
-//   ^?
+//    ^?
+
 type T6 = ApiGetEndpointResponse<typeof apiSpec, "getPosts", 200>;
-//   ^?
+//    ^?
+
 type T7 = ApiGetEndpointResponse<typeof apiSpec, "getPostsById", 404>;
-//   ^?
+//    ^?
 
 /**
  * Infer schema types
  */
+
 type T8 = ApiInferEndpointInputBody<typeof apiSpec, "attachFile">;
-//   ^?
+//    ^?
+
 type T9 = ApiInferEndpointInputParam<typeof apiSpec, "getAttachment", "id">;
-//   ^?
+//    ^?
+
 type T10 = ApiInferEndpointInputParam<typeof apiSpec, "getPostsById", "id">;
-//   ^?
+//    ^?
+
 type T11 = ApiInferEndpointInputParam<typeof apiSpec, "attachFile", "id">;
-//   ^?
+//    ^?
+
 type T12 = ApiInferEndpointInputQuery<typeof apiSpec, "getPosts", "userId">;
-//   ^?
+//    ^?
+
 type T13 = ApiInferEndpointOutputResponse<typeof apiSpec, "getPosts", 200>;
-//   ^?
+//    ^?
