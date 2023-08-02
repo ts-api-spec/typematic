@@ -16,7 +16,7 @@ import type {
   ApiGetEndpointBodyByPath,
   ApiGetEndpointBodySchema,
   ApiGetEndpointBodySchemaByPath,
-} from "./endpoint-utilities.types";
+} from "./api-spec.parser.types";
 import type { InferInputTypeFromSchema, InferOutputTypeFromSchema, SchemaType } from "./schema-type.types";
 import { ApiTypeScriptSchema } from "./schema-type-ts";
 
@@ -32,8 +32,8 @@ export type ApiGetSchemaType<
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
 > = Api["metadata"] extends infer $Metadata extends ApiBaseMetadata
   ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
-    ? $SchemaType
-    : DefaultSchemaType
+  ? $SchemaType
+  : DefaultSchemaType
   : DefaultSchemaType;
 
 /**
@@ -52,8 +52,8 @@ export type ApiGetEndpointSchemaType<
   $Endpoint extends ApiEndpoint = ApiGetEndpoint<Api, Endpoint>
 > = $Endpoint["metadata"] extends infer $Metadata extends ApiBaseMetadata
   ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
-    ? $SchemaType
-    : ApiGetSchemaType<Api, DefaultSchemaType>
+  ? $SchemaType
+  : ApiGetSchemaType<Api, DefaultSchemaType>
   : ApiGetSchemaType<Api, DefaultSchemaType>;
 
 /**
@@ -74,8 +74,8 @@ export type ApiGetEndpointSchemaTypeByPath<
   $Endpoint extends ApiEndpoint = ApiGetEndpointByPath<Api, Method, Path>
 > = $Endpoint["metadata"] extends infer $Metadata extends ApiBaseMetadata
   ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
-    ? $SchemaType
-    : ApiGetSchemaType<Api, DefaultSchemaType>
+  ? $SchemaType
+  : ApiGetSchemaType<Api, DefaultSchemaType>
   : ApiGetSchemaType<Api, DefaultSchemaType>;
 
 /**
@@ -94,10 +94,10 @@ export type ApiGetEndpointBodySchemaType<
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
 > = ApiGetEndpointBody<Api, Endpoint> extends infer $Body extends ApiRequestBodyParameter
   ? $Body["metadata"] extends infer $Metadata extends ApiBaseMetadata
-    ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
-      ? $SchemaType
-      : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
-    : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
+  ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
+  ? $SchemaType
+  : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
+  : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
   : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>;
 
 /**
@@ -118,10 +118,10 @@ export type ApiGetEndpointBodySchemaTypeByPath<
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
 > = ApiGetEndpointBodyByPath<Api, Method, Path> extends infer $Body extends ApiRequestBodyParameter
   ? $Body["metadata"] extends infer $Metadata extends ApiBaseMetadata
-    ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
-      ? $SchemaType
-      : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>
-    : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>
+  ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
+  ? $SchemaType
+  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>
+  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>
   : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>;
 
 /**
@@ -144,10 +144,10 @@ export type ApiGetEndpointEntrySchemaType<
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
 > = ApiGetEndpoint<Api, Endpoint>[Entry][EntryParam] extends infer $Entry extends ApiParameter
   ? $Entry["metadata"] extends infer $Metadata extends ApiBaseMetadata
-    ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
-      ? $SchemaType
-      : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
-    : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
+  ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
+  ? $SchemaType
+  : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
+  : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>
   : ApiGetEndpointSchemaType<Api, Endpoint, DefaultSchemaType>;
 
 /**
@@ -172,10 +172,10 @@ export type ApiGetEndpointEntrySchemaTypeByPath<
   DefaultSchemaType extends SchemaType = typeof ApiTypeScriptSchema
 > = ApiGetEndpointByPath<Api, Method, Path>[Entry][EntryParam] extends infer $Entry extends ApiParameter
   ? $Entry["metadata"] extends infer $Metadata extends ApiBaseMetadata
-    ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
-      ? $SchemaType
-      : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>
-    : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>
+  ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
+  ? $SchemaType
+  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>
+  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>
   : ApiGetEndpointSchemaTypeByPath<Api, Method, Path, DefaultSchemaType>;
 
 /**

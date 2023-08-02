@@ -1,5 +1,5 @@
 import { describe, it, expectTypeOf } from "vitest";
-import type { ApiPathToParams } from "./endpoint-utilities.types";
+import type { ApiPathToParams } from "./api-spec.parser.types";
 
 describe("ApiPathToParams", () => {
   it("should parse path with path params", () => {

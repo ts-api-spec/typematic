@@ -24,18 +24,18 @@ export type ApiGetSchemaOf<T> = T extends ApiParameter ? (T extends GenericSchem
  */
 export type ApiGetPathsByMethod<Api extends ApiSpec, Method extends ApiMethod> = {
   [Endpoint in keyof Api["endpoints"]]: ApiGetEndpoint<Api, Endpoint>["method"] extends
-    | Lowercase<Method>
-    | Uppercase<Method>
-    ? ApiGetEndpoint<Api, Endpoint>["path"]
-    : never;
+  | Lowercase<Method>
+  | Uppercase<Method>
+  ? ApiGetEndpoint<Api, Endpoint>["path"]
+  : never;
 }[keyof Api["endpoints"]];
 
 type PathSeparator = ["/", "?", "&", "#", "=", "(", ")", "[", "]", "<", ">", "%", "@"];
 
 type FilterParams<Params, Acc extends string[] = []> = Params extends [infer First, ...infer Rest]
   ? First extends `:${infer Param}`
-    ? FilterParams<Rest, [...Acc, ...Split<Param, ":">]>
-    : FilterParams<Rest, Acc>
+  ? FilterParams<Rest, [...Acc, ...Split<Param, ":">]>
+  : FilterParams<Rest, Acc>
   : Acc;
 
 /**
@@ -72,10 +72,10 @@ export type ApiGetEndpointByPath<
   Path extends ApiGetPathsByMethod<Api, Method>
 > = {
   [Endpoint in keyof Api["endpoints"]]: Lowercase<ApiGetEndpoint<Api, Endpoint>["method"]> extends Lowercase<Method>
-    ? ApiGetEndpoint<Api, Endpoint>["path"] extends Path
-      ? ApiGetEndpoint<Api, Endpoint>
-      : never
-    : never;
+  ? ApiGetEndpoint<Api, Endpoint>["path"] extends Path
+  ? ApiGetEndpoint<Api, Endpoint>
+  : never
+  : never;
 }[keyof Api["endpoints"]];
 
 /**
