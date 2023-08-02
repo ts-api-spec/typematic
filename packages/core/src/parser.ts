@@ -1,4 +1,4 @@
-import type { ApiMethod, ApiSpec } from "./api-spec.types";
+import type { ApiMethod, ApiSpec } from "./types";
 import type {
   ApiGetPathsByMethod,
   ApiGetEndpoint,
@@ -37,7 +37,7 @@ import type {
   ApiGetEndpointResponseByPath,
   ApiGetEndpointResponseSchema,
   ApiGetEndpointResponseSchemaByPath,
-} from "./api-spec.parser.types";
+} from "./parser.types";
 
 function apiGetSchemaOf(value: any): unknown {
   if (value && "schema" in value) {

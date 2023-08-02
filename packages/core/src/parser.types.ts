@@ -1,4 +1,4 @@
-import type { ApiSpec, ApiMethod, ApiParameter } from "./api-spec.types";
+import type { ApiSpec, ApiMethod, ApiParameter } from "./types";
 import type { Split, SplitMany } from "./utils.types";
 
 /**

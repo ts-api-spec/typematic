@@ -1,4 +1,4 @@
-import type { ApiEndpoint, ApiMetadata, ApiSpec } from "./api-spec.types";
+import type { ApiEndpoint, ApiMetadata, ApiSpec } from "./types";
 import type { Merge } from "./utils.types";
 
 /**
@@ -90,12 +90,12 @@ export class ApiSpecBuilder<Metadata extends ApiMetadata | undefined, Endpoints 
    */
   build(): Metadata extends undefined
     ? {
-        endpoints: Endpoints;
-      }
+      endpoints: Endpoints;
+    }
     : {
-        metadata: Metadata;
-        endpoints: Endpoints;
-      } {
+      metadata: Metadata;
+      endpoints: Endpoints;
+    } {
     return this.spec as any;
   }
 }

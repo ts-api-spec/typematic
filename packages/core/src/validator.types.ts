@@ -6,7 +6,7 @@ import type {
   ApiMethod,
   ApiParameter,
   ApiSpec,
-} from "./api-spec.types";
+} from "./types";
 import type {
   ApiGetSchemaOf,
   ApiGetPathsByMethod,
@@ -16,7 +16,7 @@ import type {
   ApiGetEndpointBodyByPath,
   ApiGetEndpointBodySchema,
   ApiGetEndpointBodySchemaByPath,
-} from "./api-spec.parser.types";
+} from "./parser.types";
 import type { InferInputTypeFromSchema, InferOutputTypeFromSchema, SchemaType } from "./schema-type.types";
 import { ApiTypeScriptSchema } from "./schema-type-ts";
 
