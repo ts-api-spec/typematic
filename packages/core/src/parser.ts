@@ -45,10 +45,19 @@ import type {
   ApiGetEndpointEntrySchemaByPath,
 } from "./parser.types";
 
+/**
+ * allow to throw an error in an expression
+ * @param message - The error message to throw
+ */
 function raiseError(message: string): never {
   throw new Error(message);
 }
 
+/**
+ * extracts the schema from an api spec entry
+ * @param value - The api spec entry to get the schema from
+ * @returns
+ */
 function apiGetSchemaOf(value: any): unknown {
   if (value && "schema" in value) {
     if (typeof value.validate === "function" || typeof value.parse === "function") {
@@ -59,6 +68,13 @@ function apiGetSchemaOf(value: any): unknown {
   return value;
 }
 
+/**
+ * get an endpoint entry from an api spec
+ * @param api - The api spec to get the endpoint from
+ * @param endpointName - The name of the endpoint to get
+ * @returns the endpoint entry
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpoint<Api extends ApiSpec, Endpoint extends keyof Api["endpoints"]>(
   api: Api,
   endpointName: Endpoint
@@ -66,6 +82,14 @@ export function apiGetEndpoint<Api extends ApiSpec, Endpoint extends keyof Api["
   return (api.endpoints[endpointName as string] as any) ?? raiseError(`Endpoint not found: ${endpointName as string}`);
 }
 
+/**
+ * get an endpoint entry from an api spec by path
+ * @param api - The api spec to get the endpoint from
+ * @param method - The method of the endpoint to get
+ * @param path - The path of the endpoint to get
+ * @returns the endpoint entry
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -79,6 +103,13 @@ export function apiGetEndpointByPath<
   throw new Error(`Endpoint not found for method ${method} and path ${path}`);
 }
 
+/**
+ * get the body of an endpoint from an api spec
+ * @param api - The api spec to get body from
+ * @param endpointName - The name of the endpoint to get body from
+ * @returns the body of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointBody<Api extends ApiSpec, Endpoint extends keyof Api["endpoints"]>(
   api: Api,
   endpointName: Endpoint
@@ -87,6 +118,14 @@ export function apiGetEndpointBody<Api extends ApiSpec, Endpoint extends keyof A
   return endpoint.body as any;
 }
 
+/**
+ * get the body entry of an endpoint from an api spec by path
+ * @param api - The api spec to get body from
+ * @param method - The method of the endpoint to get body from
+ * @param path - The path of the endpoint to get body from
+ * @returns the body entry of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointBodyByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -96,6 +135,13 @@ export function apiGetEndpointBodyByPath<
   return endpoint.body as any;
 }
 
+/**
+ * get the schema of the body entry of an endpoint from an api spec
+ * @param api - The api spec to get body schema from
+ * @param endpointName - The name of the endpoint to get body schema from
+ * @returns the schema of the body entry
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointBodySchema<Api extends ApiSpec, Endpoint extends keyof Api["endpoints"]>(
   api: Api,
   endpointName: Endpoint
@@ -104,6 +150,14 @@ export function apiGetEndpointBodySchema<Api extends ApiSpec, Endpoint extends k
   return apiGetSchemaOf(endpoint.body) as any;
 }
 
+/**
+ * get the schema of the body entry of an endpoint from an api spec by path
+ * @param api - The api spec to get body schema from
+ * @param method - The method of the endpoint to get body schema from
+ * @param path - The path of the endpoint to get body schema from
+ * @returns the schema of the body entry
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointBodySchemaByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -113,6 +167,22 @@ export function apiGetEndpointBodySchemaByPath<
   return apiGetSchemaOf(endpoint.body) as any;
 }
 
+/**
+ * get the entries parameters of an endpoint from an api spec
+ *
+ * entries can be:
+ * - query
+ * - path parameter
+ * - header
+ * - cookie
+ * - response
+ *
+ * @param api - The api spec to get entries from
+ * @param endpointName - The name of the endpoint to get entries from
+ * @param entryName - The name of the entry to get
+ * @returns the entries parameters of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointEntries<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
@@ -122,6 +192,22 @@ export function apiGetEndpointEntries<
   return endpoint[entryName] as any;
 }
 
+/**
+ * get the entries parameters of an endpoint from an api spec by path
+ *
+ * entries can be:
+ * - query
+ * - path parameter
+ * - header
+ * - cookie
+ * - response
+ *
+ * @param api - The api spec to get entries from
+ * @param method - The method of the endpoint to get entries from
+ * @param path - The path of the endpoint to get entries from
+ * @param entryName - The name of the entry to get
+ * @returns the entries parameters of the endpoint
+ */
 export function apiGetEndpointEntriesByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -132,6 +218,23 @@ export function apiGetEndpointEntriesByPath<
   return endpoint[entryName] as any;
 }
 
+/**
+ * get an entry parameter of an endpoint from an api spec
+ *
+ * entry parameters can be from:
+ * - query
+ * - path parameter
+ * - header
+ * - cookie
+ * - response
+ *
+ * @param api - The api spec to get entry from
+ * @param endpointName - The name of the endpoint to get entry from
+ * @param entryName - The name of the entry to get
+ * @param entryParam - The name of the entry parameter to get
+ * @returns the entry parameter from the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointEntry<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
@@ -148,13 +251,22 @@ export function apiGetEndpointEntry<
 }
 
 /**
+ * get an entry parameter of an endpoint from an api spec by path
  *
- * @param api
- * @param method
- * @param path
- * @param entryName
- * @param entryParam
- * @returns
+ * entry parameters can be from:
+ * - query
+ * - path parameter
+ * - header
+ * - cookie
+ * - response
+ *
+ * @param api - The api spec to get entry from
+ * @param method - The method of the endpoint to get entry from
+ * @param path - The path of the endpoint to get entry from
+ * @param entryName - The name of the entry to get
+ * @param entryParam - The name of the entry parameter to get
+ * @returns the entry parameter from the endpoint
+ * @throws if the endpoint is not found
  */
 export function apiGetEndpointEntryByPath<
   Api extends ApiSpec,
@@ -173,6 +285,15 @@ export function apiGetEndpointEntryByPath<
   return endpoint[entryName]?.[entryParam];
 }
 
+/**
+ * get the schema of an entry parameter of an endpoint from an api spec
+ * @param api - The api spec to get the schema from
+ * @param endpointName - The name of the endpoint to get the schema from
+ * @param entryName - The name of the entry to get the schema from
+ * @param entryParam - The name of the entry parameter to get the schema from
+ * @returns the schema of the entry parameter
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointEntrySchema<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
@@ -188,6 +309,16 @@ export function apiGetEndpointEntrySchema<
   return apiGetSchemaOf(endpoint[entryName]?.[entryParam]) as any;
 }
 
+/**
+ * get the schema of an entry parameter of an endpoint from an api spec by path
+ * @param api - The api spec to get the schema from
+ * @param method - The method of the endpoint to get the schema from
+ * @param path - The path of the endpoint to get the schema from
+ * @param entryName - The name of the entry to get the schema from
+ * @param entryParam - The name of the entry parameter to get the schema from
+ * @returns the schema of the entry parameter
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointEntrySchemaByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -205,6 +336,13 @@ export function apiGetEndpointEntrySchemaByPath<
   return apiGetSchemaOf(endpoint[entryName]?.[entryParam]) as any;
 }
 
+/**
+ * get the path parameters of an endpoint from an api spec
+ * @param api - The api spec to get path parameters from
+ * @param endpointName - The name of the endpoint to get path parameters from
+ * @returns the path parameters of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointParams<Api extends ApiSpec, Endpoint extends keyof Api["endpoints"]>(
   api: Api,
   endpointName: Endpoint
@@ -213,6 +351,14 @@ export function apiGetEndpointParams<Api extends ApiSpec, Endpoint extends keyof
   return endpoint.params as any;
 }
 
+/**
+ * get the path parameters of an endpoint from an api spec by path
+ * @param api - The api spec to get path parameters from
+ * @param method - The method of the endpoint to get path parameters from
+ * @param path - The path of the endpoint to get path parameters from
+ * @returns the path parameters of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointParamsByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -222,6 +368,14 @@ export function apiGetEndpointParamsByPath<
   return endpoint.params as any;
 }
 
+/**
+ * get a path parameter of an endpoint from an api spec
+ * @param api - The api spec to get path parameter from
+ * @param endpointName - The name of the endpoint to get path parameter from
+ * @param paramName - The name of the path parameter to get
+ * @returns the path parameter from the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointParam<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
@@ -231,6 +385,15 @@ export function apiGetEndpointParam<
   return endpoint.params?.[paramName] as any;
 }
 
+/**
+ * get a path parameter of an endpoint from an api spec by path
+ * @param api - The api spec to get path parameter from
+ * @param method - The method of the endpoint to get path parameter from
+ * @param path - The path of the endpoint to get path parameter from
+ * @param paramName - The name of the path parameter to get
+ * @returns the path parameter from the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointParamByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -241,6 +404,14 @@ export function apiGetEndpointParamByPath<
   return endpoint.params?.[paramName] as any;
 }
 
+/**
+ * get the schema of a path parameter of an endpoint from an api spec
+ * @param api - The api spec to get the schema from
+ * @param endpointName - The name of the endpoint to get the schema from
+ * @param paramName - The name of the path parameter to get the schema from
+ * @returns the schema of the path parameter
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointParamSchema<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
@@ -250,6 +421,15 @@ export function apiGetEndpointParamSchema<
   return apiGetSchemaOf(endpoint.params?.[paramName]) as any;
 }
 
+/**
+ * get the schema of a path parameter of an endpoint from an api spec by path
+ * @param api - The api spec to get the schema from
+ * @param method - The method of the endpoint to get the schema from
+ * @param path - The path of the endpoint to get the schema from
+ * @param paramName - The name of the path parameter to get the schema from
+ * @returns the schema of the path parameter
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointParamSchemaByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -260,6 +440,13 @@ export function apiGetEndpointParamSchemaByPath<
   return apiGetSchemaOf(endpoint.params?.[paramName]) as any;
 }
 
+/**
+ * get the query parameters of an endpoint from an api spec
+ * @param api - The api spec to get query parameters from
+ * @param endpointName - The name of the endpoint to get query parameters from
+ * @returns the query parameters of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointQueries<Api extends ApiSpec, Endpoint extends keyof Api["endpoints"]>(
   api: Api,
   endpointName: Endpoint
@@ -268,6 +455,14 @@ export function apiGetEndpointQueries<Api extends ApiSpec, Endpoint extends keyo
   return endpoint.query as any;
 }
 
+/**
+ * get the query parameters of an endpoint from an api spec by path
+ * @param api - The api spec to get query parameters from
+ * @param method - The method of the endpoint to get query parameters from
+ * @param path - The path of the endpoint to get query parameters from
+ * @returns the query parameters of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointQueriesByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -277,6 +472,14 @@ export function apiGetEndpointQueriesByPath<
   return endpoint.query as any;
 }
 
+/**
+ * get a query parameter of an endpoint from an api spec
+ * @param api - The api spec to get query parameter from
+ * @param endpointName - The name of the endpoint to get query parameter from
+ * @param queryName - The name of the query parameter to get
+ * @returns the query parameter from the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointQuery<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
@@ -286,6 +489,15 @@ export function apiGetEndpointQuery<
   return endpoint.query?.[queryName] as any;
 }
 
+/**
+ * get a query parameter of an endpoint from an api spec by path
+ * @param api - The api spec to get query parameter from
+ * @param method - The method of the endpoint to get query parameter from
+ * @param path - The path of the endpoint to get query parameter from
+ * @param queryName - The name of the query parameter to get
+ * @returns the query parameter from the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointQueryByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -296,6 +508,14 @@ export function apiGetEndpointQueryByPath<
   return endpoint.query?.[queryName] as any;
 }
 
+/**
+ * get the schema of a query parameter of an endpoint from an api spec
+ * @param api - The api spec to get the schema from
+ * @param endpointName - The name of the endpoint to get the schema from
+ * @param queryName - The name of the query parameter to get the schema from
+ * @returns the schema of the query parameter
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointQuerySchema<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
@@ -305,6 +525,15 @@ export function apiGetEndpointQuerySchema<
   return apiGetSchemaOf(endpoint.query?.[queryName]) as any;
 }
 
+/**
+ * get the schema of a query parameter of an endpoint from an api spec by path
+ * @param api - The api spec to get the schema from
+ * @param method - The method of the endpoint to get the schema from
+ * @param path - The path of the endpoint to get the schema from
+ * @param queryName - The name of the query parameter to get the schema from
+ * @returns the schema of the query parameter
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointQuerySchemaByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -315,6 +544,13 @@ export function apiGetEndpointQuerySchemaByPath<
   return apiGetSchemaOf(endpoint.query?.[queryName]) as any;
 }
 
+/**
+ * get the headers of an endpoint from an api spec
+ * @param api - The api spec to get headers from
+ * @param endpointName - The name of the endpoint to get headers from
+ * @returns the headers of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointHeaders<Api extends ApiSpec, Endpoint extends keyof Api["endpoints"]>(
   api: Api,
   endpointName: Endpoint
@@ -323,6 +559,14 @@ export function apiGetEndpointHeaders<Api extends ApiSpec, Endpoint extends keyo
   return endpoint.headers as any;
 }
 
+/**
+ * get the headers of an endpoint from an api spec by path
+ * @param api - The api spec to get headers from
+ * @param method - The method of the endpoint to get headers from
+ * @param path - The path of the endpoint to get headers from
+ * @returns the headers of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointHeadersByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -332,6 +576,14 @@ export function apiGetEndpointHeadersByPath<
   return endpoint.headers as any;
 }
 
+/**
+ * get a header of an endpoint from an api spec
+ * @param api - The api spec to get header from
+ * @param endpointName - The name of the endpoint to get header from
+ * @param headerName - The name of the header to get
+ * @returns the header from the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointHeader<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
@@ -341,6 +593,15 @@ export function apiGetEndpointHeader<
   return endpoint.headers?.[headerName] as any;
 }
 
+/**
+ * get a header of an endpoint from an api spec by path
+ * @param api - The api spec to get header from
+ * @param method - The method of the endpoint to get header from
+ * @param path - The path of the endpoint to get header from
+ * @param headerName - The name of the header to get
+ * @returns the header from the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointHeaderByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -351,6 +612,14 @@ export function apiGetEndpointHeaderByPath<
   return endpoint.headers?.[headerName] as any;
 }
 
+/**
+ * get the schema of a header of an endpoint from an api spec
+ * @param api - The api spec to get the schema from
+ * @param endpointName - The name of the endpoint to get the schema from
+ * @param headerName - The name of the header to get the schema from
+ * @returns the schema of the header
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointHeaderSchema<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
@@ -360,6 +629,15 @@ export function apiGetEndpointHeaderSchema<
   return apiGetSchemaOf(endpoint.headers?.[headerName]) as any;
 }
 
+/**
+ * get the schema of a header of an endpoint from an api spec by path
+ * @param api - The api spec to get the schema from
+ * @param method - The method of the endpoint to get the schema from
+ * @param path - The path of the endpoint to get the schema from
+ * @param headerName - The name of the header to get the schema from
+ * @returns the schema of the header
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointHeaderSchemaByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -375,6 +653,13 @@ export function apiGetEndpointHeaderSchemaByPath<
   return apiGetSchemaOf(endpoint.headers?.[headerName]) as any;
 }
 
+/**
+ * get the cookies of an endpoint from an api spec
+ * @param api - The api spec to get cookies from
+ * @param endpointName - The name of the endpoint to get cookies from
+ * @returns the cookies of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointCookies<Api extends ApiSpec, Endpoint extends keyof Api["endpoints"]>(
   api: Api,
   endpointName: Endpoint
@@ -383,6 +668,14 @@ export function apiGetEndpointCookies<Api extends ApiSpec, Endpoint extends keyo
   return endpoint.cookies as any;
 }
 
+/**
+ * get the cookies of an endpoint from an api spec by path
+ * @param api - The api spec to get cookies from
+ * @param method - The method of the endpoint to get cookies from
+ * @param path - The path of the endpoint to get cookies from
+ * @returns the cookies of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointCookiesByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -392,6 +685,14 @@ export function apiGetEndpointCookiesByPath<
   return endpoint.cookies as any;
 }
 
+/**
+ * get a cookie of an endpoint from an api spec
+ * @param api - The api spec to get cookie from
+ * @param endpointName - The name of the endpoint to get cookie from
+ * @param cookieName - The name of the cookie to get
+ * @returns the cookie from the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointCookie<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
@@ -401,6 +702,15 @@ export function apiGetEndpointCookie<
   return endpoint.cookies?.[cookieName] as any;
 }
 
+/**
+ * get a cookie of an endpoint from an api spec by path
+ * @param api - The api spec to get cookie from
+ * @param method - The method of the endpoint to get cookie from
+ * @param path - The path of the endpoint to get cookie from
+ * @param cookieName - The name of the cookie to get
+ * @returns the cookie from the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointCookieByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -411,6 +721,14 @@ export function apiGetEndpointCookieByPath<
   return endpoint.cookies?.[cookieName] as any;
 }
 
+/**
+ * get the schema of a cookie of an endpoint from an api spec
+ * @param api - The api spec to get the schema from
+ * @param endpointName - The name of the endpoint to get the schema from
+ * @param cookieName - The name of the cookie to get the schema from
+ * @returns the schema of the cookie
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointCookieSchema<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
@@ -420,6 +738,15 @@ export function apiGetEndpointCookieSchema<
   return apiGetSchemaOf(endpoint.cookies?.[cookieName]) as any;
 }
 
+/**
+ * get the schema of a cookie of an endpoint from an api spec by path
+ * @param api - The api spec to get the schema from
+ * @param method - The method of the endpoint to get the schema from
+ * @param path - The path of the endpoint to get the schema from
+ * @param cookieName - The name of the cookie to get the schema from
+ * @returns the schema of the cookie
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointCookieSchemaByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -435,6 +762,13 @@ export function apiGetEndpointCookieSchemaByPath<
   return apiGetSchemaOf(endpoint.cookies?.[cookieName]) as any;
 }
 
+/**
+ * get the responses of an endpoint from an api spec
+ * @param api - The api spec to get responses from
+ * @param endpointName - The name of the endpoint to get responses from
+ * @returns the responses of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointResponses<Api extends ApiSpec, Endpoint extends keyof Api["endpoints"]>(
   api: Api,
   endpointName: Endpoint
@@ -443,6 +777,14 @@ export function apiGetEndpointResponses<Api extends ApiSpec, Endpoint extends ke
   return endpoint.responses as any;
 }
 
+/**
+ * get the responses of an endpoint from an api spec by path
+ * @param api - The api spec to get responses from
+ * @param method - The method of the endpoint to get responses from
+ * @param path - The path of the endpoint to get responses from
+ * @returns the responses of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointResponsesByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -452,6 +794,14 @@ export function apiGetEndpointResponsesByPath<
   return endpoint.responses as any;
 }
 
+/**
+ * get a response of an endpoint from an api spec
+ * @param api - The api spec to get response from
+ * @param endpointName - The name of the endpoint to get response from
+ * @param statusCode - The status code of the response to get
+ * @returns the response of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointResponse<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
@@ -461,6 +811,15 @@ export function apiGetEndpointResponse<
   return endpoint.responses?.[statusCode] as any;
 }
 
+/**
+ * get a response of an endpoint from an api spec by path
+ * @param api - The api spec to get response from
+ * @param method - The method of the endpoint to get response from
+ * @param path - The path of the endpoint to get response from
+ * @param statusCode - The status code of the response to get
+ * @returns the response of the endpoint
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointResponseByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
@@ -476,6 +835,14 @@ export function apiGetEndpointResponseByPath<
   return endpoint.responses?.[statusCode] as any;
 }
 
+/**
+ * get the schema of a response of an endpoint from an api spec
+ * @param api - The api spec to get the schema from
+ * @param endpointName - The name of the endpoint to get the schema from
+ * @param statusCode - The status code of the response to get the schema from
+ * @returns the schema of the response
+ * @throws if the endpoint is not found
+ */
 export function apiGetEndpointResponseSchema<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
@@ -485,6 +852,14 @@ export function apiGetEndpointResponseSchema<
   return apiGetSchemaOf(endpoint.responses?.[statusCode]) as any;
 }
 
+/**
+ * get the schema of a response of an endpoint from an api spec by path
+ * @param api - The api spec to get the schema from
+ * @param method - The method of the endpoint to get the schema from
+ * @param path - The path of the endpoint to get the schema from
+ * @param statusCode - The status code of the response to get the schema from
+ * @returns the schema of the response
+ */
 export function apiGetEndpointResponseSchemaByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
