@@ -21,16 +21,15 @@ import type { InferInputTypeFromSchema, InferOutputTypeFromSchema, SchemaType } 
 import { ApiTypeScriptSchema } from "./schema-type-ts";
 
 declare global {
-
   /**
    * Schema type registry
    *
    * Allows to register custom schema default schema type
-   * 
+   *
    * The default schema type is used when no schema type is defined in the api spec
-   * 
+   *
    * If Api spec implementors want to use a different schema type, they can register a new one by overriding the default
-   * 
+   *
    * @example
    * ```ts
    * declare global {
@@ -51,13 +50,11 @@ declare global {
  * @param Api - Api spec
  * @returns Schema type
  */
-export type ApiGetSchemaType<
-  Api extends ApiSpec,
-> = Api["metadata"] extends infer $Metadata extends ApiBaseMetadata
+export type ApiGetSchemaType<Api extends ApiSpec> = Api["metadata"] extends infer $Metadata extends ApiBaseMetadata
   ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
-  ? $SchemaType
-  : ReturnType<SchemaTypeRegistry['default']>
-  : ReturnType<SchemaTypeRegistry['default']>
+    ? $SchemaType
+    : ReturnType<SchemaTypeRegistry["default"]>
+  : ReturnType<SchemaTypeRegistry["default"]>;
 
 /**
  * Get the schema type for an endpoint by looking at the metadata
@@ -73,8 +70,8 @@ export type ApiGetEndpointSchemaType<
   $Endpoint extends ApiEndpoint = ApiGetEndpoint<Api, Endpoint>
 > = $Endpoint["metadata"] extends infer $Metadata extends ApiBaseMetadata
   ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
-  ? $SchemaType
-  : ApiGetSchemaType<Api>
+    ? $SchemaType
+    : ApiGetSchemaType<Api>
   : ApiGetSchemaType<Api>;
 
 /**
@@ -93,8 +90,8 @@ export type ApiGetEndpointSchemaTypeByPath<
   $Endpoint extends ApiEndpoint = ApiGetEndpointByPath<Api, Method, Path>
 > = $Endpoint["metadata"] extends infer $Metadata extends ApiBaseMetadata
   ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
-  ? $SchemaType
-  : ApiGetSchemaType<Api>
+    ? $SchemaType
+    : ApiGetSchemaType<Api>
   : ApiGetSchemaType<Api>;
 
 /**
@@ -108,13 +105,13 @@ export type ApiGetEndpointSchemaTypeByPath<
  */
 export type ApiGetEndpointBodySchemaType<
   Api extends ApiSpec,
-  Endpoint extends keyof Api["endpoints"],
+  Endpoint extends keyof Api["endpoints"]
 > = ApiGetEndpointBody<Api, Endpoint> extends infer $Body extends ApiRequestBodyParameter
   ? $Body["metadata"] extends infer $Metadata extends ApiBaseMetadata
-  ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
-  ? $SchemaType
-  : ApiGetEndpointSchemaType<Api, Endpoint>
-  : ApiGetEndpointSchemaType<Api, Endpoint>
+    ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
+      ? $SchemaType
+      : ApiGetEndpointSchemaType<Api, Endpoint>
+    : ApiGetEndpointSchemaType<Api, Endpoint>
   : ApiGetEndpointSchemaType<Api, Endpoint>;
 
 /**
@@ -130,13 +127,13 @@ export type ApiGetEndpointBodySchemaType<
 export type ApiGetEndpointBodySchemaTypeByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
-  Path extends ApiGetPathsByMethod<Api, Method>,
+  Path extends ApiGetPathsByMethod<Api, Method>
 > = ApiGetEndpointBodyByPath<Api, Method, Path> extends infer $Body extends ApiRequestBodyParameter
   ? $Body["metadata"] extends infer $Metadata extends ApiBaseMetadata
-  ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
-  ? $SchemaType
-  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>
-  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>
+    ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
+      ? $SchemaType
+      : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>
+    : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>
   : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>;
 
 /**
@@ -154,13 +151,13 @@ export type ApiGetEndpointEntrySchemaType<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
   Entry extends ApiEntry,
-  EntryParam extends keyof ApiGetEndpoint<Api, Endpoint>[Entry],
+  EntryParam extends keyof ApiGetEndpoint<Api, Endpoint>[Entry]
 > = ApiGetEndpoint<Api, Endpoint>[Entry][EntryParam] extends infer $Entry extends ApiParameter
   ? $Entry["metadata"] extends infer $Metadata extends ApiBaseMetadata
-  ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
-  ? $SchemaType
-  : ApiGetEndpointSchemaType<Api, Endpoint>
-  : ApiGetEndpointSchemaType<Api, Endpoint>
+    ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
+      ? $SchemaType
+      : ApiGetEndpointSchemaType<Api, Endpoint>
+    : ApiGetEndpointSchemaType<Api, Endpoint>
   : ApiGetEndpointSchemaType<Api, Endpoint>;
 
 /**
@@ -180,13 +177,13 @@ export type ApiGetEndpointEntrySchemaTypeByPath<
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
   Entry extends ApiEntry,
-  EntryParam extends keyof ApiGetEndpointByPath<Api, Method, Path>[Entry],
+  EntryParam extends keyof ApiGetEndpointByPath<Api, Method, Path>[Entry]
 > = ApiGetEndpointByPath<Api, Method, Path>[Entry][EntryParam] extends infer $Entry extends ApiParameter
   ? $Entry["metadata"] extends infer $Metadata extends ApiBaseMetadata
-  ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
-  ? $SchemaType
-  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>
-  : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>
+    ? $Metadata["schemaType"] extends infer $SchemaType extends SchemaType
+      ? $SchemaType
+      : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>
+    : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>
   : ApiGetEndpointSchemaTypeByPath<Api, Method, Path>;
 
 /**
@@ -319,13 +316,7 @@ export type ApiInferEndpointInputEntryByPath<
   Path extends ApiGetPathsByMethod<Api, Method>,
   Entry extends ApiEntry,
   EntryParam extends keyof ApiGetEndpointByPath<Api, Method, Path>[Entry],
-  $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaTypeByPath<
-    Api,
-    Method,
-    Path,
-    Entry,
-    EntryParam
-  >,
+  $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaTypeByPath<Api, Method, Path, Entry, EntryParam>,
   $EntryParam = ApiGetEndpointByPath<Api, Method, Path>[Entry][EntryParam]
 > = InferInputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, ApiGetSchemaOf<$EntryParam>>;
 
@@ -375,13 +366,7 @@ export type ApiInferEndpointOutputEntryByPath<
   Path extends ApiGetPathsByMethod<Api, Method>,
   Entry extends ApiEntry,
   EntryParam extends keyof ApiGetEndpointByPath<Api, Method, Path>[Entry],
-  $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaTypeByPath<
-    Api,
-    Method,
-    Path,
-    Entry,
-    EntryParam
-  >,
+  $SchemaType extends SchemaType = ApiGetEndpointEntrySchemaTypeByPath<Api, Method, Path, Entry, EntryParam>,
   $EntryParam = ApiGetEndpointByPath<Api, Method, Path>[Entry][EntryParam]
 > = InferOutputTypeFromSchema<NonNullable<$SchemaType["_provider"]>, ApiGetSchemaOf<$EntryParam>>;
 
@@ -402,7 +387,7 @@ export type ApiInferEndpointOutputEntryByPath<
 export type ApiInferEndpointInputParam<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  PathParam extends keyof ApiGetEndpoint<Api, Endpoint>["params"],
+  PathParam extends keyof ApiGetEndpoint<Api, Endpoint>["params"]
 > = ApiInferEndpointInputEntry<Api, Endpoint, "params", PathParam>;
 
 /**
@@ -424,7 +409,7 @@ export type ApiInferEndpointInputParamByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  PathParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["params"],
+  PathParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["params"]
 > = ApiInferEndpointInputEntryByPath<Api, Method, Path, "params", PathParam>;
 
 /**
@@ -444,7 +429,7 @@ export type ApiInferEndpointInputParamByPath<
 export type ApiInferEndpointInputQuery<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  QueryParam extends keyof ApiGetEndpoint<Api, Endpoint>["query"],
+  QueryParam extends keyof ApiGetEndpoint<Api, Endpoint>["query"]
 > = ApiInferEndpointInputEntry<Api, Endpoint, "query", QueryParam>;
 
 /**
@@ -465,7 +450,7 @@ export type ApiInferEndpointInputQueryByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  QueryParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["query"],
+  QueryParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["query"]
 > = ApiInferEndpointInputEntryByPath<Api, Method, Path, "query", QueryParam>;
 
 /**
@@ -485,7 +470,7 @@ export type ApiInferEndpointInputQueryByPath<
 export type ApiInferEndpointInputHeader<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  HeaderParam extends keyof ApiGetEndpoint<Api, Endpoint>["headers"],
+  HeaderParam extends keyof ApiGetEndpoint<Api, Endpoint>["headers"]
 > = ApiInferEndpointInputEntry<Api, Endpoint, "headers", HeaderParam>;
 
 /**
@@ -506,7 +491,7 @@ export type ApiInferEndpointInputHeaderByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  HeaderParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["headers"],
+  HeaderParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["headers"]
 > = ApiInferEndpointInputEntryByPath<Api, Method, Path, "headers", HeaderParam>;
 
 /**
@@ -526,7 +511,7 @@ export type ApiInferEndpointInputHeaderByPath<
 export type ApiInferEndpointInputCookie<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  CookieParam extends keyof ApiGetEndpoint<Api, Endpoint>["cookies"],
+  CookieParam extends keyof ApiGetEndpoint<Api, Endpoint>["cookies"]
 > = ApiInferEndpointInputEntry<Api, Endpoint, "cookies", CookieParam>;
 
 /**
@@ -547,7 +532,7 @@ export type ApiInferEndpointInputCookieByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  CookieParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["cookies"],
+  CookieParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["cookies"]
 > = ApiInferEndpointInputEntryByPath<Api, Method, Path, "cookies", CookieParam>;
 
 /**
@@ -567,7 +552,7 @@ export type ApiInferEndpointInputCookieByPath<
 export type ApiInferEndpointInputResponse<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  StatusCode extends keyof ApiGetEndpoint<Api, Endpoint>["responses"],
+  StatusCode extends keyof ApiGetEndpoint<Api, Endpoint>["responses"]
 > = ApiInferEndpointInputEntry<Api, Endpoint, "responses", StatusCode>;
 
 /**
@@ -588,7 +573,7 @@ export type ApiInferEndpointInputResponseByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  StatusCode extends keyof ApiGetEndpointByPath<Api, Method, Path>["responses"],
+  StatusCode extends keyof ApiGetEndpointByPath<Api, Method, Path>["responses"]
 > = ApiInferEndpointInputEntryByPath<Api, Method, Path, "responses", StatusCode>;
 
 /**
@@ -608,7 +593,7 @@ export type ApiInferEndpointInputResponseByPath<
 export type ApiInferEndpointOutputParam<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  PathParam extends keyof ApiGetEndpoint<Api, Endpoint>["params"],
+  PathParam extends keyof ApiGetEndpoint<Api, Endpoint>["params"]
 > = ApiInferEndpointOutputEntry<Api, Endpoint, "params", PathParam>;
 
 /**
@@ -629,7 +614,7 @@ export type ApiInferEndpointOutputParamByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  PathParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["params"],
+  PathParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["params"]
 > = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "params", PathParam>;
 
 /**
@@ -649,7 +634,7 @@ export type ApiInferEndpointOutputParamByPath<
 export type ApiInferEndpointOutputQuery<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  QueryParam extends keyof ApiGetEndpoint<Api, Endpoint>["query"],
+  QueryParam extends keyof ApiGetEndpoint<Api, Endpoint>["query"]
 > = ApiInferEndpointOutputEntry<Api, Endpoint, "query", QueryParam>;
 
 /**
@@ -670,7 +655,7 @@ export type ApiInferEndpointOutputQueryByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  QueryParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["query"],
+  QueryParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["query"]
 > = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "query", QueryParam>;
 
 /**
@@ -690,7 +675,7 @@ export type ApiInferEndpointOutputQueryByPath<
 export type ApiInferEndpointOutputHeader<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  HeaderParam extends keyof ApiGetEndpoint<Api, Endpoint>["headers"],
+  HeaderParam extends keyof ApiGetEndpoint<Api, Endpoint>["headers"]
 > = ApiInferEndpointOutputEntry<Api, Endpoint, "headers", HeaderParam>;
 
 /**
@@ -711,7 +696,7 @@ export type ApiInferEndpointOutputHeaderByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  HeaderParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["headers"],
+  HeaderParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["headers"]
 > = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "headers", HeaderParam>;
 
 /**
@@ -731,7 +716,7 @@ export type ApiInferEndpointOutputHeaderByPath<
 export type ApiInferEndpointOutputCookie<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  CookieParam extends keyof ApiGetEndpoint<Api, Endpoint>["cookies"],
+  CookieParam extends keyof ApiGetEndpoint<Api, Endpoint>["cookies"]
 > = ApiInferEndpointOutputEntry<Api, Endpoint, "cookies", CookieParam>;
 
 /**
@@ -752,7 +737,7 @@ export type ApiInferEndpointOutputCookieByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  CookieParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["cookies"],
+  CookieParam extends keyof ApiGetEndpointByPath<Api, Method, Path>["cookies"]
 > = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "cookies", CookieParam>;
 
 /**
@@ -772,7 +757,7 @@ export type ApiInferEndpointOutputCookieByPath<
 export type ApiInferEndpointOutputResponse<
   Api extends ApiSpec,
   Endpoint extends keyof Api["endpoints"],
-  StatusCode extends keyof ApiGetEndpoint<Api, Endpoint>["responses"],
+  StatusCode extends keyof ApiGetEndpoint<Api, Endpoint>["responses"]
 > = ApiInferEndpointOutputEntry<Api, Endpoint, "responses", StatusCode>;
 
 /**
@@ -793,5 +778,5 @@ export type ApiInferEndpointOutputResponseByPath<
   Api extends ApiSpec,
   Method extends ApiMethod,
   Path extends ApiGetPathsByMethod<Api, Method>,
-  StatusCode extends keyof ApiGetEndpointByPath<Api, Method, Path>["responses"],
+  StatusCode extends keyof ApiGetEndpointByPath<Api, Method, Path>["responses"]
 > = ApiInferEndpointOutputEntryByPath<Api, Method, Path, "responses", StatusCode>;
