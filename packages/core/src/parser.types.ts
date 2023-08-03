@@ -1,4 +1,4 @@
-import type { ApiSpec, ApiMethod, ApiParameter } from "./types";
+import type { ApiSpec, ApiMethod, ApiParameter, ApiEntry } from "./types";
 import type { Split, SplitMany } from "./utils.types";
 
 /**
@@ -24,18 +24,18 @@ export type ApiGetSchemaOf<T> = T extends ApiParameter ? (T extends GenericSchem
  */
 export type ApiGetPathsByMethod<Api extends ApiSpec, Method extends ApiMethod> = {
   [Endpoint in keyof Api["endpoints"]]: ApiGetEndpoint<Api, Endpoint>["method"] extends
-  | Lowercase<Method>
-  | Uppercase<Method>
-  ? ApiGetEndpoint<Api, Endpoint>["path"]
-  : never;
+    | Lowercase<Method>
+    | Uppercase<Method>
+    ? ApiGetEndpoint<Api, Endpoint>["path"]
+    : never;
 }[keyof Api["endpoints"]];
 
 type PathSeparator = ["/", "?", "&", "#", "=", "(", ")", "[", "]", "<", ">", "%", "@"];
 
 type FilterParams<Params, Acc extends string[] = []> = Params extends [infer First, ...infer Rest]
   ? First extends `:${infer Param}`
-  ? FilterParams<Rest, [...Acc, ...Split<Param, ":">]>
-  : FilterParams<Rest, Acc>
+    ? FilterParams<Rest, [...Acc, ...Split<Param, ":">]>
+    : FilterParams<Rest, Acc>
   : Acc;
 
 /**
@@ -72,14 +72,91 @@ export type ApiGetEndpointByPath<
   Path extends ApiGetPathsByMethod<Api, Method>
 > = {
   [Endpoint in keyof Api["endpoints"]]: Lowercase<ApiGetEndpoint<Api, Endpoint>["method"]> extends Lowercase<Method>
-  ? ApiGetEndpoint<Api, Endpoint>["path"] extends Path
-  ? ApiGetEndpoint<Api, Endpoint>
-  : never
-  : never;
+    ? ApiGetEndpoint<Api, Endpoint>["path"] extends Path
+      ? ApiGetEndpoint<Api, Endpoint>
+      : never
+    : never;
 }[keyof Api["endpoints"]];
 
 /**
- * Get all the expoint path parameters from an api spec using the endpoint name
+ * Get all the endpoint entry parameters from an api spec using the endpoint name
+ * @param Api - Api specification
+ * @param Endpoint - Endpoint name
+ * @param Entry - Entry name
+ * @returns All the endpoint path parameters
+ */
+export type ApiGetEndpointEntries<
+  Api extends ApiSpec,
+  Endpoint extends keyof Api["endpoints"],
+  Entry extends ApiEntry
+> = ApiGetEndpoint<Api, Endpoint>[Entry];
+
+/**
+ * Get all the endpoint entry parameters from an api spec using the endpoint path
+ * @param Api - Api specification
+ * @param Method - HTTP method
+ * @param Path - Endpoint path
+ * @param Entry - Entry name
+ * @returns All the endpoint path parameters
+ */
+export type ApiGetEndpointEntriesByPath<
+  Api extends ApiSpec,
+  Method extends ApiMethod,
+  Path extends ApiGetPathsByMethod<Api, Method>,
+  Entry extends ApiEntry
+> = ApiGetEndpointByPath<Api, Method, Path>[Entry];
+
+/**
+ * Get an endpoint entry parameter from an api spec using the endpoint name and entry parameter name
+ * @param Api - Api specification
+ * @param Endpoint - Endpoint name
+ * @param Entry - Entry name
+ * @param EntryParam - Entry parameter name
+ * @returns Endpoint path parameter
+ */
+export type ApiGetEndpointEntry<
+  Api extends ApiSpec,
+  Endpoint extends keyof Api["endpoints"],
+  Entry extends ApiEntry,
+  EntryParam extends keyof ApiGetEndpointEntries<Api, Endpoint, Entry>
+> = ApiGetEndpointEntries<Api, Endpoint, Entry>[EntryParam];
+
+/**
+ * Get an endpoint entry parameter from an api spec using the endpoint path and entry parameter name
+ * @param Api - Api specification
+ * @param Method - HTTP method
+ * @param Path - Endpoint path
+ * @param Entry - Entry name
+ * @param EntryParam - Entry parameter name
+ * @returns Endpoint path parameter
+ */
+export type ApiGetEndpointEntryByPath<
+  Api extends ApiSpec,
+  Method extends ApiMethod,
+  Path extends ApiGetPathsByMethod<Api, Method>,
+  Entry extends ApiEntry,
+  EntryParam extends keyof ApiGetEndpointEntriesByPath<Api, Method, Path, Entry>
+> = ApiGetEndpointEntriesByPath<Api, Method, Path, Entry>[EntryParam];
+
+export type ApiGetEndpointEntrySchema<
+  Api extends ApiSpec,
+  Endpoint extends keyof Api["endpoints"],
+  Entry extends ApiEntry,
+  EntryParam extends keyof ApiGetEndpointEntries<Api, Endpoint, Entry>,
+  $Entry = ApiGetEndpointEntry<Api, Endpoint, Entry, EntryParam>
+> = ApiGetSchemaOf<$Entry>;
+
+export type ApiGetEndpointEntrySchemaByPath<
+  Api extends ApiSpec,
+  Method extends ApiMethod,
+  Path extends ApiGetPathsByMethod<Api, Method>,
+  Entry extends ApiEntry,
+  EntryParam extends keyof ApiGetEndpointEntriesByPath<Api, Method, Path, Entry>,
+  $Entry = ApiGetEndpointEntryByPath<Api, Method, Path, Entry, EntryParam>
+> = ApiGetSchemaOf<$Entry>;
+
+/**
+ * Get all the eendpoint path parameters from an api spec using the endpoint name
  * @param Api - Api specification
  * @param Endpoint - Endpoint name
  * @returns All the endpoint path parameters
@@ -90,7 +167,7 @@ export type ApiGetEndpointParams<Api extends ApiSpec, Endpoint extends keyof Api
 >["params"];
 
 /**
- * Get all the expoint path parameters from an api spec using the endpoint path
+ * Get all the endpoint path parameters from an api spec using the endpoint path
  * @param Api - Api specification
  * @param Method - HTTP method
  * @param Path - Endpoint path

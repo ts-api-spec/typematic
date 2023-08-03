@@ -1,4 +1,4 @@
-import type { ApiMethod, ApiSpec } from "./types";
+import type { ApiEntry, ApiMethod, ApiSpec } from "./types";
 import type {
   ApiGetPathsByMethod,
   ApiGetEndpoint,
@@ -37,11 +37,21 @@ import type {
   ApiGetEndpointResponseByPath,
   ApiGetEndpointResponseSchema,
   ApiGetEndpointResponseSchemaByPath,
+  ApiGetEndpointEntries,
+  ApiGetEndpointEntriesByPath,
+  ApiGetEndpointEntry,
+  ApiGetEndpointEntryByPath,
+  ApiGetEndpointEntrySchema,
+  ApiGetEndpointEntrySchemaByPath,
 } from "./parser.types";
+
+function raiseError(message: string): never {
+  throw new Error(message);
+}
 
 function apiGetSchemaOf(value: any): unknown {
   if (value && "schema" in value) {
-    if ("validate" in (value.schema as any)) {
+    if (typeof value.validate === "function" || typeof value.parse === "function") {
       return value;
     }
     return value.schema;
@@ -53,7 +63,7 @@ export function apiGetEndpoint<Api extends ApiSpec, Endpoint extends keyof Api["
   api: Api,
   endpointName: Endpoint
 ): ApiGetEndpoint<Api, Endpoint> {
-  return api.endpoints[endpointName as string] as any;
+  return (api.endpoints[endpointName as string] as any) ?? raiseError(`Endpoint not found: ${endpointName as string}`);
 }
 
 export function apiGetEndpointByPath<
@@ -101,6 +111,98 @@ export function apiGetEndpointBodySchemaByPath<
 >(api: Api, method: Method, path: Path): ApiGetEndpointBodySchemaByPath<Api, Method, Path> {
   const endpoint = apiGetEndpointByPath(api, method, path);
   return apiGetSchemaOf(endpoint.body) as any;
+}
+
+export function apiGetEndpointEntries<
+  Api extends ApiSpec,
+  Endpoint extends keyof Api["endpoints"],
+  Entry extends ApiEntry
+>(api: Api, endpointName: Endpoint, entryName: Entry): ApiGetEndpointEntries<Api, Endpoint, Entry> {
+  const endpoint = apiGetEndpoint(api, endpointName);
+  return endpoint[entryName] as any;
+}
+
+export function apiGetEndpointEntriesByPath<
+  Api extends ApiSpec,
+  Method extends ApiMethod,
+  Path extends ApiGetPathsByMethod<Api, Method>,
+  Entry extends ApiEntry
+>(api: Api, method: Method, path: Path, entryName: Entry): ApiGetEndpointEntriesByPath<Api, Method, Path, Entry> {
+  const endpoint = apiGetEndpointByPath(api, method, path);
+  return endpoint[entryName] as any;
+}
+
+export function apiGetEndpointEntry<
+  Api extends ApiSpec,
+  Endpoint extends keyof Api["endpoints"],
+  Entry extends ApiEntry,
+  EntryName extends keyof ApiGetEndpointEntries<Api, Endpoint, Entry>
+>(
+  api: Api,
+  endpointName: Endpoint,
+  entryName: Entry,
+  entryParam: EntryName
+): ApiGetEndpointEntry<Api, Endpoint, Entry, EntryName> {
+  const endpoint = apiGetEndpoint(api, endpointName) as any;
+  return endpoint[entryName]?.[entryParam];
+}
+
+/**
+ *
+ * @param api
+ * @param method
+ * @param path
+ * @param entryName
+ * @param entryParam
+ * @returns
+ */
+export function apiGetEndpointEntryByPath<
+  Api extends ApiSpec,
+  Method extends ApiMethod,
+  Path extends ApiGetPathsByMethod<Api, Method>,
+  Entry extends ApiEntry,
+  EntryName extends keyof ApiGetEndpointEntriesByPath<Api, Method, Path, Entry>
+>(
+  api: Api,
+  method: Method,
+  path: Path,
+  entryName: Entry,
+  entryParam: EntryName
+): ApiGetEndpointEntryByPath<Api, Method, Path, Entry, EntryName> {
+  const endpoint = apiGetEndpointByPath(api, method, path) as any;
+  return endpoint[entryName]?.[entryParam];
+}
+
+export function apiGetEndpointEntrySchema<
+  Api extends ApiSpec,
+  Endpoint extends keyof Api["endpoints"],
+  Entry extends ApiEntry,
+  EntryName extends keyof ApiGetEndpointEntries<Api, Endpoint, Entry>
+>(
+  api: Api,
+  endpointName: Endpoint,
+  entryName: Entry,
+  entryParam: EntryName
+): ApiGetEndpointEntrySchema<Api, Endpoint, Entry, EntryName> {
+  const endpoint = apiGetEndpoint(api, endpointName) as any;
+  return apiGetSchemaOf(endpoint[entryName]?.[entryParam]) as any;
+}
+
+export function apiGetEndpointEntrySchemaByPath<
+  Api extends ApiSpec,
+  Method extends ApiMethod,
+  Path extends ApiGetPathsByMethod<Api, Method>,
+  Entry extends ApiEntry,
+  EntryName extends keyof ApiGetEndpointEntriesByPath<Api, Method, Path, Entry>
+>(
+  api: Api,
+  method: Method,
+  path: Path,
+  entryName: Entry,
+  entryParam: EntryName
+): ApiGetEndpointEntrySchemaByPath<Api, Method, Path, Entry, EntryName> {
+  const endpoint = apiGetEndpointByPath(api, method, path) as any;
+  return apiGetSchemaOf(endpoint[entryName]?.[entryParam]) as any;
 }
 
 export function apiGetEndpointParams<Api extends ApiSpec, Endpoint extends keyof Api["endpoints"]>(
