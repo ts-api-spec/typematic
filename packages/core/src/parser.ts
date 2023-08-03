@@ -7,6 +7,12 @@ import type {
   ApiGetEndpointBodyByPath,
   ApiGetEndpointBodySchema,
   ApiGetEndpointBodySchemaByPath,
+  ApiGetEndpointEntries,
+  ApiGetEndpointEntriesByPath,
+  ApiGetEndpointEntry,
+  ApiGetEndpointEntryByPath,
+  ApiGetEndpointEntrySchema,
+  ApiGetEndpointEntrySchemaByPath,
   ApiGetEndpointParams,
   ApiGetEndpointParamsByPath,
   ApiGetEndpointParam,
@@ -37,12 +43,6 @@ import type {
   ApiGetEndpointResponseByPath,
   ApiGetEndpointResponseSchema,
   ApiGetEndpointResponseSchemaByPath,
-  ApiGetEndpointEntries,
-  ApiGetEndpointEntriesByPath,
-  ApiGetEndpointEntry,
-  ApiGetEndpointEntryByPath,
-  ApiGetEndpointEntrySchema,
-  ApiGetEndpointEntrySchemaByPath,
 } from "./parser.types";
 
 /**
