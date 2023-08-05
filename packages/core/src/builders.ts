@@ -1,5 +1,11 @@
-import type { ApiEndpoint, ApiMetadata, ApiSpec } from "./types";
+import type { ApiEndpoint, ApiMetadata, ApiMethod, ApiSpec } from "./types";
 import type { Merge } from "./utils.types";
+
+export type EndpointGetPathsByMethod<Endpoints extends Record<string, ApiEndpoint>, Method extends ApiMethod> = {
+  [Endpoint in keyof Endpoints]: Endpoints[Endpoint]["method"] extends Lowercase<Method> | Uppercase<Method>
+    ? Endpoints[Endpoint]["path"]
+    : never;
+}[keyof Endpoints];
 
 /**
  * create an api spec
@@ -68,16 +74,31 @@ export class ApiSpecBuilder<Metadata extends ApiMetadata | undefined, Endpoints 
    * .build();
    * ```
    */
-  addEndpoint<Alias extends string, const Endpoint extends ApiEndpoint>(
-    alias: Alias extends keyof Endpoints ? `Error: '${Alias}' is already defined` : Alias,
-    endpoint: Endpoint
+  addEndpoint<const Alias, const Endpoint>(
+    alias: Alias extends string
+      ? Alias extends keyof Endpoints
+        ? `Error: '${Alias}' is already defined`
+        : Alias
+      : string,
+    endpoint: Endpoint extends ApiEndpoint
+      ? Endpoint extends {
+          method: Endpoint["method"];
+          path: EndpointGetPathsByMethod<Endpoints, Endpoint["method"]>;
+        }
+        ? ApiEndpoint & {
+            path: `Error: '${Endpoint["method"]} ${Endpoint["path"]}' is already defined. if you need to define the same endpoint with different responses, try appending a fragment to differentiate them. example: '${Endpoint["method"]} ${Endpoint["path"]}#fragment'`;
+          }
+        : Endpoint
+      : ApiEndpoint
   ): ApiSpecBuilder<
     Metadata,
     Merge<
       Endpoints,
-      {
-        [key in Alias]: Endpoint;
-      }
+      Alias extends string
+        ? {
+            [key in Alias]: Endpoint;
+          }
+        : never
     >
   > {
     this.spec.endpoints[alias] = endpoint;
@@ -90,12 +111,12 @@ export class ApiSpecBuilder<Metadata extends ApiMetadata | undefined, Endpoints 
    */
   build(): Metadata extends undefined
     ? {
-      endpoints: Endpoints;
-    }
+        endpoints: Endpoints;
+      }
     : {
-      metadata: Metadata;
-      endpoints: Endpoints;
-    } {
+        metadata: Metadata;
+        endpoints: Endpoints;
+      } {
     return this.spec as any;
   }
 }
