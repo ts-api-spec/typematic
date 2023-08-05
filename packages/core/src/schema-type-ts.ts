@@ -7,7 +7,7 @@ const genericTsSchema = {
   }),
 };
 
-type TsSchema<Schema> = {
+export type TsSchema<Schema> = {
   readonly _schema: Schema;
   parse: (input: unknown) => SchemaValidationResult<Schema>;
 };
