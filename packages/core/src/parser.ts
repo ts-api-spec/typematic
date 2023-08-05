@@ -96,11 +96,14 @@ export function apiGetEndpointByPath<
   Path extends ApiGetPathsByMethod<Api, Method>
 >(api: Api, method: Method, path: Path): ApiGetEndpointByPath<Api, Method, Path> {
   for (const endpoint in api.endpoints) {
-    if (api.endpoints[endpoint].method === method && api.endpoints[endpoint].path === path) {
+    if (
+      api.endpoints[endpoint].method.toLowerCase() === method.toLowerCase() &&
+      api.endpoints[endpoint].path === path
+    ) {
       return api.endpoints[endpoint] as any;
     }
   }
-  throw new Error(`Endpoint not found for method ${method} and path ${path}`);
+  throw new Error(`Endpoint not found: ${method} ${path}`);
 }
 
 /**
