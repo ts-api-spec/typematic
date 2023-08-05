@@ -3,7 +3,7 @@
  * @param T - The type to pretify
  * @returns - The pretified type
  */
-export type Pretify<T> = { [K in keyof T]: T[K] };
+export type Pretify<T> = { [K in keyof T]: T[K] } & {};
 
 /**
  * Merge two types into one
@@ -11,7 +11,7 @@ export type Pretify<T> = { [K in keyof T]: T[K] };
  * @param U - The second type, it will override the properties of the first type if they are the same
  * @returns - The merged type
  */
-export type Merge<T, U> = Pretify<Omit<T, keyof U> & U>;
+export type Merge<T, U> = Pretify<T & U>;
 
 /**
  * Split string into a tuple, using a simple string literal separator
