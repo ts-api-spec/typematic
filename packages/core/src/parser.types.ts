@@ -33,7 +33,7 @@ export type ApiGetPathsByMethod<Api extends ApiSpec, Method extends ApiMethod> =
 type PathSeparator = ["/", "?", "&", "#", "=", "(", ")", "[", "]", "<", ">", "%", "@"];
 
 type FilterParams<Params, Acc extends string[] = []> = Params extends [infer First, ...infer Rest]
-  ? First extends `:${infer Param}`
+  ? First extends `${string}:${infer Param}`
     ? FilterParams<Rest, [...Acc, ...Split<Param, ":">]>
     : FilterParams<Rest, Acc>
   : Acc;
