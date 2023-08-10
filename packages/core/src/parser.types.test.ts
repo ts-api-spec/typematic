@@ -27,7 +27,7 @@ describe("ApiPathToParams", () => {
   });
 
   it("should parse path with path params in parenthesis", () => {
-    type Test = ApiPathToParams<"/users/:id/posts/:postId/:test(test)?test2=(:hello&:world)">;
+    type Test = ApiPathToParams<"/users/:id/posts/:postId/hello:test(test)?test2=(:hello&:world)">;
     //    ^?
     expectTypeOf<Test>().toEqualTypeOf<["id", "postId", "test", "hello", "world"]>();
   });
