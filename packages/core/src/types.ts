@@ -169,6 +169,11 @@ interface ApiActivationOptions {
   outgoingResponse?: boolean;
 }
 
+export interface Serializer {
+  stringify: (data: unknown) => string;
+  parse: (data: string) => unknown;
+}
+
 /**
  * common metadatas
  */
@@ -214,6 +219,36 @@ export interface ApiMetadata extends ApiBaseMetadata {
    * List of servers for the API
    */
   readonly servers?: readonly ApiServer[];
+  /**
+   * optionnally provide a serializer to stringify and parse query parameters
+   * it will be used instead of the default serializer
+   * to serialize data after validation and deserialize data before validation
+   */
+  readonly querySerializer?: Serializer;
+  /**
+   * optionnally provide a serializer to stringify and parse header parameters
+   * it will be used instead of the default serializer
+   * to serialize data after validation and deserialize data before validation
+   */
+  readonly headersSerializer?: Serializer;
+  /**
+   * optionnally provide a serializer to stringify and parse path parameters
+   * it will be used instead of the default serializer
+   * to serialize data after validation and deserialize data before validation
+   */
+  readonly paramsSerializer?: Serializer;
+  /**
+   * optionnally provide a serializer to stringify and parse cookie parameters
+   * it will be used instead of the default serializer
+   * to serialize data after validation and deserialize data before validation
+   */
+  readonly cookiesSerializer?: Serializer;
+  /**
+   * optionnally provide a serializer to stringify and parse body parameters
+   * it will be used instead of the default serializer
+   * to serialize data after validation and deserialize data before validation
+   */
+  readonly bodySerializer?: Serializer;
 }
 
 /**
@@ -234,7 +269,14 @@ export interface ApiEndpointMetadata extends ApiBaseMetadata {
   readonly resourceId?: string;
 }
 
-export interface ApiParameterMetadata extends ApiBaseMetadata {}
+export interface ApiParameterMetadata extends ApiBaseMetadata {
+  /**
+   * optionnally provide a transformer to stringify and parse the data
+   * it will be used instead of the default serializer
+   * to serialize data after validation and deserialize data before validation
+   */
+  readonly serializer?: Serializer;
+}
 
 /**
  * Mimes types for the request or response body
@@ -349,4 +391,10 @@ export interface ApiDataMetadata extends ApiBaseMetadata {
    * json is the default format
    */
   readonly format?: ApiDataFormat;
+  /**
+   * optionnally provide a serializer to stringify and parse the data
+   * it will be used instead of the default serializer
+   * to serialize data after validation and deserialize data before validation
+   */
+  readonly serializer?: Serializer;
 }
